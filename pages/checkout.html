@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Asilivia Tech</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/cart.css">
+    <link rel="stylesheet" href="../styles/checkout.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <a href="../index.html" class="logo">Asilivia<span>Tech</span></a>
+            
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <nav>
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="products.html">Products</a></li>
+                    <li><a href="services.html">Repair Services</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="blog.html">Blog</a></li>
+                    <li><a href="booking.html">Booking</a></li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                </ul>
+            </nav>
+            
+            <div class="header-actions">
+                <a href="login.html"><i class="fas fa-user"></i></a>
+                <a href="cart.html" class="cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Checkout Section -->
+    <section class="checkout-page">
+        <div class="container">
+            <h2 class="section-title">Checkout</h2>
+
+            <div class="checkout-steps">
+                <div class="step active">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Fulfillment</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Payment</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Confirmation</div>
+                </div>
+            </div>
+            
+            <div class="checkout-container">
+                <div class="checkout-content">
+                    <div class="checkout-form">
+                        <h3>Customer Details</h3>
+                        
+                        <form id="checkoutForm">
+                            <div class="form-row">
+                                <div class="form-group" style="flex:1;">
+                                    <label for="fullName">Full Name</label>
+                                    <input type="text" id="fullName" name="fullName" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="phone">Phone Number</label>
+                                <input type="tel" id="phone" name="phone" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="saveAddress" name="saveAddress">
+                                    <span>Save this address for future orders</span>
+                                </label>
+                            </div>
+                            
+                            <h3>Fulfillment Method</h3>
+                            <div class="shipping-methods">
+                                <label class="radio-label">
+                                    <input type="radio" name="fulfillment" value="delivery" checked>
+                                    <div class="radio-content">
+                                        <span class="method-name">Delivery</span>
+                                        <span class="method-details">We deliver within Kenya</span>
+                                    </div>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="fulfillment" value="pickup">
+                                    <div class="radio-content">
+                                        <span class="method-name">Shop Pickup</span>
+                                        <span class="method-details">Pick up at Asilivia Tech, Narok Town</span>
+                                    </div>
+                                </label>
+                            </div>
+                            
+                            <div class="delivery-location" style="display:none;">
+                                <h4>Delivery Location</h4>
+                                <p class="small">Please pin your delivery location. Your browser may ask for permission to access location.</p>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="lat">Latitude</label>
+                                        <input type="text" id="lat" name="lat" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="lng">Longitude</label>
+                                        <input type="text" id="lng" name="lng" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="locationNote">Location Note (optional)</label>
+                                    <input type="text" id="locationNote" name="locationNote" placeholder="Apartment, landmark or Google Maps link">
+                                </div>
+                                <button type="button" class="btn" id="pinLocationBtn">Pin My Location</button>
+                            </div>
+
+                            <h3>Payment Method</h3>
+                            <div class="shipping-methods">
+                                <label class="radio-label">
+                                    <input type="radio" name="payment" value="cash" checked>
+                                    <div class="radio-content">
+                                        <span class="method-name">Cash</span>
+                                        <span class="method-details">Pay on delivery or pickup</span>
+                                    </div>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="payment" value="mpesa">
+                                    <div class="radio-content">
+                                        <span class="method-name">M-Pesa</span>
+                                        <span class="method-details">Pay via M-Pesa</span>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="form-group mpesa-field" style="display:none;">
+                                <label for="mpesaPhone">M-Pesa Phone Number</label>
+                                <input type="tel" id="mpesaPhone" name="mpesaPhone" placeholder="e.g. 07XX XXX XXX">
+                            </div>
+                            
+                            <div class="form-actions">
+                                <a href="cart.html" class="btn btn-secondary">Back to Cart</a>
+                                <button type="submit" class="btn btn-accent">Place Order</button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="order-summary">
+                        <h3>Order Summary</h3>
+                        
+                        <div class="summary-items">
+                            <div class="summary-item">
+                                <div class="item-image">
+                                    <img src="../assets/images/placeholder-smartphone.jpg" alt="Smartphone" onerror="this.src='https://via.placeholder.com/60x60?text=Product'">
+                                </div>
+                                <div class="item-details">
+                                    <h4>Premium Smartphone XYZ</h4>
+                                    <p>Quantity: 1</p>
+                                </div>
+                                <div class="item-price">KSh 899.99</div>
+                            </div>
+                            
+                            <div class="summary-item">
+                                <div class="item-image">
+                                    <img src="../assets/images/placeholder-headphones.jpg" alt="Headphones" onerror="this.src='https://via.placeholder.com/60x60?text=Product'">
+                                </div>
+                                <div class="item-details">
+                                    <h4>Wireless Noise-Cancelling Headphones</h4>
+                                    <p>Quantity: 1</p>
+                                </div>
+                                <div class="item-price">KSh 249.99</div>
+                            </div>
+                            
+                            <div class="summary-item">
+                                <div class="item-image">
+                                    <img src="../assets/images/placeholder-smartwatch.jpg" alt="Smartwatch" onerror="this.src='https://via.placeholder.com/60x60?text=Product'">
+                                </div>
+                                <div class="item-details">
+                                    <h4>Smart Fitness Tracker</h4>
+                                    <p>Quantity: 1</p>
+                                </div>
+                                <div class="item-price">KSh 199.99</div>
+                            </div>
+                        </div>
+                        
+                        <div class="summary-totals">
+                            <div class="summary-row">
+                                <span>Subtotal</span>
+                                <span>KSh 1349.97</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Tax</span>
+                                <span>KSh 135.00</span>
+                            </div>
+                            <div class="summary-row discount">
+                                <span>Discount</span>
+                                <span>-KSh 50.00</span>
+                            </div>
+                            <div class="summary-row total">
+                                <span>Total</span>
+                                <span>KSh 1434.97</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h3>Asilivia Tech</h3>
+                    <p>Your one-stop solution for all electronics shopping and repair needs.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Shop</h3>
+                    <ul>
+                        <li><a href="products.html?category=mobiles">Mobile Phones</a></li>
+                        <li><a href="products.html?category=laptops">Laptops</a></li>
+                        <li><a href="products.html?category=accessories">Accessories</a></li>
+                        <li><a href="products.html?category=refurbished">Refurbished Devices</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Services</h3>
+                    <ul>
+                        <li><a href="services.html">Phone Repair</a></li>
+                        <li><a href="services.html">Laptop Repair</a></li>
+                        <li><a href="services.html">Other Device Repair</a></li>
+                        <li><a href="booking.html">Book a Repair</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Contact Us</h3>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> Narok Town, Narok</li>
+                        <li><i class="fas fa-phone"></i> +254 799 220 210</li>
+                        <li><i class="fas fa-envelope"></i> info@asilivia.tech</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 Asilivia Tech. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../scripts/main.js"></script>
+    <script>
+    (function(){
+        const deliveryRadio = document.querySelector('input[name="fulfillment"][value="delivery"]');
+        const pickupRadio = document.querySelector('input[name="fulfillment"][value="pickup"]');
+        const addressFields = document.querySelectorAll('.address-field input');
+        const mpesaRadio = document.querySelector('input[name="payment"][value="mpesa"]');
+        const cashRadio = document.querySelector('input[name="payment"][value="cash"]');
+        const mpesaField = document.querySelector('.mpesa-field');
+        const mpesaPhone = document.getElementById('mpesaPhone');
+        const placeOrderBtn = document.querySelector('#checkoutForm .btn.btn-accent');
+        const fullNameInput = document.getElementById('fullName');
+        const emailInput = document.getElementById('email');
+        const phoneInput = document.getElementById('phone');
+
+        // ===== Cart helpers (fallbacks if not provided by main.js) =====
+        function _getCart(){
+            try{const raw=localStorage.getItem('cart');const parsed=raw?JSON.parse(raw):[];return Array.isArray(parsed)?parsed:[]}catch(e){return []}
+        }
+        const getCart=(typeof window.getCart==='function')?window.getCart:_getCart;
+        function cartCount(cart){return cart.reduce((s,it)=>s+(parseInt(it.qty)||0),0)}
+
+        // ===== Delivery fee logic (Distance-based from Narok Town) =====
+        function haversine(lat1, lon1, lat2, lon2){
+            const R=6371; // km
+            const toRad = d=>d*Math.PI/180;
+            const dLat=toRad(lat2-lat1);
+            const dLon=toRad(lon2-lon1);
+            const a=Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
+            const c=2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R*c;
+        }
+        function computeDeliveryFeeByDistance(lat, lng, isDelivery){
+            if(!isDelivery) return 0;
+            if(!lat || !lng) return 0; // require pin
+            const NAROK_LAT = -1.0940, NAROK_LNG = 35.8711;
+            const dist = haversine(NAROK_LAT, NAROK_LNG, Number(lat), Number(lng));
+            if (dist <= 5) return 250;      // within town
+            if (dist <= 30) return 350;     // metro/nearby
+            if (dist <= 300) return 500;    // major towns
+            if (dist <= 600) return 700;    // other counties
+            return 1000;                     // remote/far
+        }
+
+        // ===== Render Order Summary from cart =====
+        function renderSummary(){
+            const itemsWrap=document.querySelector('.summary-items');
+            const totalsWrap=document.querySelector('.summary-totals');
+            if(!itemsWrap||!totalsWrap) return;
+            const cart=getCart();
+            itemsWrap.innerHTML='';
+            let subtotal=0;
+            cart.forEach(it=>{
+                const qty=Math.max(1, parseInt(it.qty)||1);
+                const price=Math.max(0, Number(it.price)||0);
+                const total=qty*price;
+                subtotal+=total;
+                const row=document.createElement('div');
+                row.className='summary-item';
+                row.innerHTML=`
+                    <div class="item-image">
+                        <img src="${it.image||'../assets/images/placeholder-smartphone.jpg'}" alt="${it.name}" onerror="this.src='https://via.placeholder.com/60x60?text=Product'">
+                    </div>
+                    <div class="item-details">
+                        <h4>${it.name}</h4>
+                        <p>Quantity: ${qty}</p>
+                    </div>
+                    <div class="item-price">KSh ${price.toFixed(2)}</div>`;
+                itemsWrap.appendChild(row);
+            });
+            const discount=0; // can plug a code later
+            const isDelivery = document.querySelector('input[name="fulfillment"][value="delivery"]')?.checked;
+            const latVal = document.getElementById('lat')?.value;
+            const lngVal = document.getElementById('lng')?.value;
+            const deliveryFee = computeDeliveryFeeByDistance(latVal, lngVal, !!isDelivery);
+            const total=subtotal+deliveryFee-discount;
+            // Rebuild totals
+            totalsWrap.innerHTML=`
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span>KSh ${subtotal.toFixed(2)}</span>
+                </div>
+                <div class="summary-row">
+                    <span>${isDelivery ? 'Delivery' : 'Pickup'}</span>
+                    <span>${isDelivery ? ('KSh ' + deliveryFee.toFixed(2)) : 'KSh 0.00'}</span>
+                </div>
+                <div class="summary-row discount">
+                    <span>Discount</span>
+                    <span>${discount>0?('-KSh '+discount.toFixed(2)):'KSh 0.00'}</span>
+                </div>
+                <div class="summary-row total">
+                    <span>Total</span>
+                    <span>KSh ${total.toFixed(2)}</span>
+                </div>`;
+
+            // Disable order button when cart empty
+            if(placeOrderBtn){ placeOrderBtn.disabled = cartCount(cart)===0; }
+        }
+
+        function applyFulfillment() {
+            const pickup = pickupRadio && pickupRadio.checked;
+            const locWrap = document.querySelector('.delivery-location');
+            if (locWrap) locWrap.style.display = pickup ? 'none' : '';
+            // Disable Place Order if Delivery is selected without coordinates
+            if (placeOrderBtn) {
+                if (!pickup) {
+                    const hasCoords = !!(document.getElementById('lat')?.value && document.getElementById('lng')?.value);
+                    placeOrderBtn.disabled = !hasCoords;
+                } else {
+                    placeOrderBtn.disabled = false;
+                }
+            }
+        }
+
+        function applyPayment() {
+            const isMpesa = mpesaRadio && mpesaRadio.checked;
+            if (mpesaField) mpesaField.style.display = isMpesa ? '' : 'none';
+            if (mpesaPhone) mpesaPhone.required = !!isMpesa;
+        }
+
+        // ===== M-Pesa (Kenya) phone validation =====
+        function isValidKenyanPhone(value){
+            if(!value) return false;
+            const v=value.replace(/\s+/g,'');
+            // Accept: 07XXXXXXXX, 01XXXXXXXX, +2547XXXXXXXX, +2541XXXXXXXX, 2547XXXXXXXX, 2541XXXXXXXX
+            return /^(?:07\d{8}|01\d{8}|\+2547\d{8}|\+2541\d{8}|2547\d{8}|2541\d{8})$/.test(v);
+        }
+
+        function attachValidation(){
+            if(!mpesaPhone) return;
+            mpesaPhone.addEventListener('input', ()=>{
+                if(mpesaRadio && mpesaRadio.checked){
+                    const ok=isValidKenyanPhone(mpesaPhone.value);
+                    mpesaPhone.setCustomValidity(ok? '': 'Enter a valid Kenyan M-Pesa number');
+                    if(placeOrderBtn) placeOrderBtn.disabled = !ok;
+                } else {
+                    mpesaPhone.setCustomValidity('');
+                }
+            });
+        }
+
+        if (deliveryRadio) deliveryRadio.addEventListener('change', ()=>{ applyFulfillment(); renderSummary(); });
+        if (pickupRadio) pickupRadio.addEventListener('change', ()=>{ applyFulfillment(); renderSummary(); });
+        const pinBtn=document.getElementById('pinLocationBtn');
+        if(pinBtn){
+            pinBtn.addEventListener('click', ()=>{
+                if(!navigator.geolocation){ alert('Geolocation is not supported by your browser.'); return; }
+                navigator.geolocation.getCurrentPosition((pos)=>{
+                    const {latitude, longitude} = pos.coords;
+                    const latI=document.getElementById('lat');
+                    const lngI=document.getElementById('lng');
+                    if(latI) latI.value = latitude.toFixed(6);
+                    if(lngI) lngI.value = longitude.toFixed(6);
+                    applyFulfillment();
+                    renderSummary();
+                }, (err)=>{
+                    alert('Could not get location. Please allow location access or enter a Google Maps link in notes.');
+                });
+            });
+        }
+        if (mpesaRadio) mpesaRadio.addEventListener('change', applyPayment);
+        if (cashRadio) cashRadio.addEventListener('change', applyPayment);
+        if (mpesaRadio) mpesaRadio.addEventListener('change', ()=>{ if(placeOrderBtn) placeOrderBtn.disabled=false; });
+
+        // Submit: create order, save, clear cart, redirect to dashboard
+        const form=document.getElementById('checkoutForm');
+        if(form){
+            form.addEventListener('submit', function(e){
+                e.preventDefault();
+                const cart=getCart();
+                if(cart.length===0){
+                    alert('Your cart is empty.');
+                    return;
+                }
+                const isDelivery = document.querySelector('input[name="fulfillment"][value="delivery"]')?.checked;
+                const latVal = document.getElementById('lat')?.value;
+                const lngVal = document.getElementById('lng')?.value;
+                const locNote = document.getElementById('locationNote')?.value || '';
+                const payment = (document.querySelector('input[name="payment"]:checked')?.value||'cash');
+                const mpesa = (document.getElementById('mpesaPhone')?.value||'');
+                const customer = {
+                    name: (fullNameInput?.value || '').trim(),
+                    email: (emailInput?.value || '').trim(),
+                    phone: (phoneInput?.value || '').trim()
+                };
+                if(!customer.name || !customer.email || !customer.phone){
+                    alert('Please fill in your name, email and phone number.');
+                    return;
+                }
+                if(isDelivery && (!latVal || !lngVal)){
+                    alert('Please pin your delivery location.');
+                    return;
+                }
+                // compute totals
+                let subtotal=0;
+                const items=cart.map(it=>{
+                    const qty=Math.max(1, parseInt(it.qty)||1);
+                    const price=Math.max(0, Number(it.price)||0);
+                    subtotal += qty*price;
+                    return { id: it.id, name: it.name, price, qty, image: it.image };
+                });
+                const deliveryFee = computeDeliveryFeeByDistance(latVal, lngVal, !!isDelivery);
+                const discount = 0;
+                const total = subtotal + (isDelivery?deliveryFee:0) - discount;
+                const orderId = 'ORD-' + Date.now();
+                const order = {
+                    id: orderId,
+                    date: new Date().toISOString(),
+                    items,
+                    subtotal, deliveryFee: isDelivery?deliveryFee:0, discount, total,
+                    status: 'Processing',
+                    paymentMethod: payment,
+                    mpesaPhone: payment==='mpesa'? mpesa : '',
+                    fulfillment: isDelivery? 'Delivery' : 'Pickup',
+                    location: isDelivery? { lat: latVal||'', lng: lngVal||'', note: locNote } : null,
+                    customer
+                };
+                // Save order
+                try{
+                    const raw=localStorage.getItem('orders');
+                    const orders= raw? JSON.parse(raw): [];
+                    if(Array.isArray(orders)){
+                        orders.unshift(order);
+                        localStorage.setItem('orders', JSON.stringify(orders));
+                    }else{
+                        localStorage.setItem('orders', JSON.stringify([order]));
+                    }
+                }catch(err){
+                    localStorage.setItem('orders', JSON.stringify([order]));
+                }
+                // Persist current customer identity for dashboard filtering
+                try {
+                    localStorage.setItem('currentCustomer', JSON.stringify(customer));
+                } catch(e) { /* ignore */ }
+                // Clear cart
+                localStorage.removeItem('cart');
+                localStorage.setItem('cartCount','0');
+                const cc=document.querySelector('.cart-count');
+                if(cc) cc.textContent='0';
+                // Redirect to dashboard orders
+                window.location.href = 'dashboard.html#orders';
+            });
+        }
+
+        // initial
+        applyFulfillment();
+        applyPayment();
+        attachValidation();
+        renderSummary();
+    })();
+    </script>
+</body>
+</html>

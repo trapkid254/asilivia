@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Asilivia Tech</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/blog.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <a href="../index.html" class="logo">Asilivia<span>Tech</span></a>
+            
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <nav>
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="products.html">Products</a></li>
+                    <li><a href="services.html">Repair Services</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="blog.html" class="active">Blog</a></li>
+                    <li><a href="booking.html">Booking</a></li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                </ul>
+            </nav>
+            
+            <div class="header-actions">
+                <a href="login.html"><i class="fas fa-user"></i></a>
+                <a href="cart.html" class="cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Blog Section -->
+    <section class="blog-page">
+        <div class="container">
+            <h2 class="section-title">Tech <span>Blog</span></h2>
+            <p class="blog-subtitle">Stay updated with the latest tech news, tips, and product reviews</p>
+            
+            <div class="blog-container">
+                <div class="blog-content">
+                    <div class="blog-filters">
+                        <div class="filter-group">
+                            <label for="categoryFilter">Category:</label>
+                            <select id="categoryFilter">
+                                <option value="all">All Categories</option>
+                                <option value="news">Tech News</option>
+                                <option value="reviews">Product Reviews</option>
+                                <option value="tips">Tips & Tutorials</option>
+                                <option value="repair">Repair Guides</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="sortFilter">Sort by:</label>
+                            <select id="sortFilter">
+                                <option value="newest">Newest First</option>
+                                <option value="oldest">Oldest First</option>
+                                <option value="popular">Most Popular</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="blog-posts">
+                        <article class="blog-post">
+                            <div class="post-image">
+                                <img src="../assets/images/blog-placeholder1.jpg" alt="Blog Post" onerror="this.src='https://via.placeholder.com/400x250?text=Blog+Post'">
+                                <span class="post-category">Tech News</span>
+                            </div>
+                            <div class="post-content">
+                                <div class="post-meta">
+                                    <span class="post-date"><i class="far fa-calendar"></i> October 15, 2023</span>
+                                    <span class="post-author"><i class="far fa-user"></i> Admin</span>
+                                </div>
+                                <h3 class="post-title"><a href="blog-single.html">The Future of Smartphones: What to Expect in 2024</a></h3>
+                                <p class="post-excerpt">Explore the upcoming trends and innovations in smartphone technology for the coming year, from foldable displays to advanced AI features.</p>
+                                <a href="blog-single.html" class="read-more">Read More <i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </article>
+                        
+                        <article class="blog-post">
+                            <div class="post-image">
+                                <img src="../assets/images/blog-placeholder2.jpg" alt="Blog Post" onerror="this.src='https://via.placeholder.com/400x250?text=Blog+Post'">
+                                <span class="post-category">Product Reviews</span>
+                            </div>
+                            <div class="post-content">
+                                <div class="post-meta">
+                                    <span class="post-date"><i class="far fa-calendar"></i> October 10, 2023</span>
+                                    <span class="post-author"><i class="far fa-user"></i> Tech Expert</span>
+                                </div>
+                                <h3 class="post-title"><a href="blog-single.html">Premium Smartphone XYZ Review: Is It Worth the Hype?</a></h3>
+                                <p class="post-excerpt">Our in-depth review of the latest Premium Smartphone XYZ, covering its features, performance, camera quality, and value for money.</p>
+                                <a href="blog-single.html" class="read-more">Read More <i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </article>
+                        
+                        <article class="blog-post">
+                            <div class="post-image">
+                                <img src="../assets/images/blog-placeholder3.jpg" alt="Blog Post" onerror="this.src='https://via.placeholder.com/400x250?text=Blog+Post'">
+                                <span class="post-category">Tips & Tutorials</span>
+                            </div>
+                            <div class="post-content">
+                                <div class="post-meta">
+                                    <span class="post-date"><i class="far fa-calendar"></i> October 5, 2023</span>
+                                    <span class="post-author"><i class="far fa-user"></i> Repair Specialist</span>
+                                </div>
+                                <h3 class="post-title"><a href="blog-single.html">10 Essential Tips to Extend Your Phone Battery Life</a></h3>
+                                <p class="post-excerpt">Learn practical tips and tricks to maximize your smartphone's battery life and keep your device running longer throughout the day.</p>
+                                <a href="blog-single.html" class="read-more">Read More <i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </article>
+                        
+                        <article class="blog-post">
+                            <div class="post-image">
+                                <img src="../assets/images/blog-placeholder4.jpg" alt="Blog Post" onerror="this.src='https://via.placeholder.com/400x250?text=Blog+Post'">
+                                <span class="post-category">Repair Guides</span>
+                            </div>
+                            <div class="post-content">
+                                <div class="post-meta">
+                                    <span class="post-date"><i class="far fa-calendar"></i> September 28, 2023</span>
+                                    <span class="post-author"><i class="far fa-user"></i> Technician</span>
+                                </div>
+                                <h3 class="post-title"><a href="blog-single.html">How to Identify Common Laptop Issues and When to Seek Help</a></h3>
+                                <p class="post-excerpt">A guide to recognizing common laptop problems, from hardware issues to software glitches, and when it's time to consult a professional.</p>
+                                <a href="blog-single.html" class="read-more">Read More <i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </article>
+                    </div>
+                    
+                    <div class="pagination">
+                        <button class="btn btn-secondary">Previous</button>
+                        <span>Page 1 of 3</span>
+                        <button class="btn">Next</button>
+                    </div>
+                </div>
+                
+                <aside class="blog-sidebar">
+                    <div class="sidebar-widget">
+                        <h3>Search</h3>
+                        <div class="search-form">
+                            <input type="text" placeholder="Search blog posts...">
+                            <button><i class="fas fa-search"></i></button>
+                        </div>
+                    </div>
+                    
+                    <div class="sidebar-widget">
+                        <h3>Categories</h3>
+                        <ul class="category-list">
+                            <li><a href="#">Tech News <span>(15)</span></a></li>
+                            <li><a href="#">Product Reviews <span>(24)</span></a></li>
+                            <li><a href="#">Tips & Tutorials <span>(18)</span></a></li>
+                            <li><a href="#">Repair Guides <span>(12)</span></a></li>
+                            <li><a href="#">Industry Insights <span>(8)</span></a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="sidebar-widget">
+                        <h3>Popular Posts</h3>
+                        <div class="popular-posts">
+                            <div class="popular-post">
+                                <div class="post-thumb">
+                                    <img src="../assets/images/blog-popular1.jpg" alt="Popular Post" onerror="this.src='https://via.placeholder.com/80x80?text=Post'">
+                                </div>
+                                <div class="post-info">
+                                    <h4><a href="#">The Best Smartphones of 2025</a></h4>
+                                    <span class="post-date">Sept 20, 2025</span>
+                                </div>
+                            </div>
+                            
+                            <div class="popular-post">
+                                <div class="post-thumb">
+                                    <img src="../assets/images/blog-popular2.jpg" alt="Popular Post" onerror="this.src='https://via.placeholder.com/80x80?text=Post'">
+                                </div>
+                                <div class="post-info">
+                                    <h4><a href="#">How to Fix Water Damaged Phones</a></h4>
+                                    <span class="post-date">Sept 15, 2023</span>
+                                </div>
+                            </div>
+                            
+                            <div class="popular-post">
+                                <div class="post-thumb">
+                                    <img src="../assets/images/blog-popular3.jpg" alt="Popular Post" onerror="this.src='https://via.placeholder.com/80x80?text=Post'">
+                                </div>
+                                <div class="post-info">
+                                    <h4><a href="#">5G Technology Explained</a></h4>
+                                    <span class="post-date">Sept 10, 2023</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sidebar-widget">
+                        <h3>Tags</h3>
+                        <div class="tags-cloud">
+                            <a href="#">Smartphones</a>
+                            <a href="#">Laptops</a>
+                            <a href="#">Repair</a>
+                            <a href="#">Tech</a>
+                            <a href="#">Reviews</a>
+                            <a href="#">Tips</a>
+                            <a href="#">5G</a>
+                            <a href="#">Battery</a>
+                            <a href="#">iOS</a>
+                            <a href="#">Android</a>
+                        </div>
+                    </div>
+                    
+                    <div class="sidebar-widget">
+                        <h3>Subscribe</h3>
+                        <p>Stay updated with our latest blog posts and news</p>
+                        <form class="subscribe-form">
+                            <input type="email" placeholder="Your email address" required>
+                            <button type="submit" class="btn btn-accent">Subscribe</button>
+                        </form>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h3>Asilivia Tech</h3>
+                    <p>Your one-stop solution for all electronics shopping and repair needs.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Shop</h3>
+                    <ul>
+                        <li><a href="products.html?category=mobiles">Mobile Phones</a></li>
+                        <li><a href="products.html?category=laptops">Laptops</a></li>
+                        <li><a href="products.html?category=accessories">Accessories</a></li>
+                        <li><a href="products.html?category=refurbished">Refurbished Devices</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Services</h3>
+                    <ul>
+                        <li><a href="services.html">Phone Repair</a></li>
+                        <li><a href="services.html">Laptop Repair</a></li>
+                        <li><a href="services.html">Other Device Repair</a></li>
+                        <li><a href="booking.html">Book a Repair</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Contact Us</h3>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> Narok Town, Narok</li>
+                        <li><i class="fas fa-phone"></i> +254 799 220 210</li>
+                        <li><i class="fas fa-envelope"></i> info@asilivia.tech</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 Asilivia Tech. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../scripts/main.js"></script>
+    <script src="../scripts/blog.js"></script>
+</body>
+</html>

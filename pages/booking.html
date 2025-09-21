@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Repair Service - Asilivia Tech</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/services.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <a href="../index.html" class="logo">Asilivia<span>Tech</span></a>
+            
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <nav>
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="products.html">Products</a></li>
+                    <li><a href="services.html">Repair Services</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="blog.html">Blog</a></li>
+                    <li><a href="booking.html" class="active">Booking</a></li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                </ul>
+            </nav>
+            
+            <div class="header-actions">
+                <a href="login.html"><i class="fas fa-user"></i></a>
+                <a href="cart.html" class="cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Booking Section -->
+    <section class="booking-page">
+        <div class="container">
+            <h2 class="section-title">Book a <span>Repair Service</span></h2>
+            
+            <div class="booking-form-container">
+                <form id="bookingForm" class="booking-form">
+                    <div class="form-step active" id="step1">
+                        <h3>Device Information</h3>
+                        
+                        <div class="form-group">
+                            <label for="deviceType">Device Type</label>
+                            <select id="deviceType" name="deviceType" required>
+                                <option value="">Select Device Type</option>
+                                <option value="smartphone">Smartphone</option>
+                                <option value="tablet">Tablet</option>
+                                <option value="laptop">Laptop</option>
+                                <option value="desktop">Desktop Computer</option>
+                                <option value="smartwatch">Smartwatch</option>
+                                <option value="gaming">Gaming Console</option>
+                                <option value="other">Other Device</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="deviceBrand">Device Brand</label>
+                            <input type="text" id="deviceBrand" name="deviceBrand" placeholder="e.g., Apple, Samsung, Dell" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="deviceModel">Device Model</label>
+                            <input type="text" id="deviceModel" name="deviceModel" placeholder="e.g., iPhone 12, Galaxy S21, XPS 13" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="issueType">Type of Issue</label>
+                            <select id="issueType" name="issueType" required>
+                                <option value="">Select Issue Type</option>
+                                <option value="screen">Screen Damage</option>
+                                <option value="battery">Battery Issues</option>
+                                <option value="water">Water Damage</option>
+                                <option value="charging">Charging Issues</option>
+                                <option value="performance">Performance Issues</option>
+                                <option value="software">Software Problems</option>
+                                <option value="other">Other Issue</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="issueDescription">Issue Description</label>
+                            <textarea id="issueDescription" name="issueDescription" rows="4" placeholder="Please describe the issue in detail..." required></textarea>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-next">Next</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-step" id="step2">
+                        <h3>Service Options</h3>
+                        
+                        <div class="form-group">
+                            <label for="serviceUrgency">How soon do you need repair?</label>
+                            <select id="serviceUrgency" name="serviceUrgency" required>
+                                <option value="standard">Standard (3-5 days)</option>
+                                <option value="express">Express (1-2 days)</option>
+                                <option value="urgent">Urgent (Same day)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="serviceLocation">Service Location</label>
+                            <select id="serviceLocation" name="serviceLocation" required>
+                                <option value="store">Bring to Store</option>
+                                <option value="pickup">Pickup from My Location</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group pickup-details" style="display: none;">
+                            <label for="pickupAddress">Pickup Address</label>
+                            <textarea id="pickupAddress" name="pickupAddress" rows="3" placeholder="Enter your full address for pickup"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Preferred Contact Method</label>
+                            <div class="radio-group">
+                                <label><input type="radio" name="contactMethod" value="phone" checked> Phone</label>
+                                <label><input type="radio" name="contactMethod" value="email"> Email</label>
+                                <label><input type="radio" name="contactMethod" value="whatsapp"> WhatsApp</label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-prev">Previous</button>
+                            <button type="button" class="btn btn-next">Next</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-step" id="step3">
+                        <h3>Your Information</h3>
+                        
+                        <div class="form-group">
+                            <label for="customerName">Full Name</label>
+                            <input type="text" id="customerName" name="customerName" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="customerEmail">Email Address</label>
+                            <input type="email" id="customerEmail" name="customerEmail" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="customerPhone">Phone Number</label>
+                            <input type="tel" id="customerPhone" name="customerPhone" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="customerAddress">Address</label>
+                            <textarea id="customerAddress" name="customerAddress" rows="3" required></textarea>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-prev">Previous</button>
+                            <button type="submit" class="btn btn-accent">Submit Booking</button>
+                        </div>
+                    </div>
+                </form>
+                
+                <div class="booking-summary">
+                    <h3>Booking Summary</h3>
+                    <div class="summary-content">
+                        <p>Complete the form to see booking summary</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h3>Asilivia Tech</h3>
+                    <p>Your one-stop solution for all electronics shopping and repair needs.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Shop</h3>
+                    <ul>
+                        <li><a href="products.html?category=mobiles">Mobile Phones</a></li>
+                        <li><a href="products.html?category=laptops">Laptops</a></li>
+                        <li><a href="products.html?category=accessories">Accessories</a></li>
+                        <li><a href="products.html?category=refurbished">Refurbished Devices</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Services</h3>
+                    <ul>
+                        <li><a href="services.html">Phone Repair</a></li>
+                        <li><a href="services.html">Laptop Repair</a></li>
+                        <li><a href="services.html">Other Device Repair</a></li>
+                        <li><a href="booking.html">Book a Repair</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Contact Us</h3>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> Narok Town, Narok</li>
+                        <li><i class="fas fa-phone"></i> +254 799 220 210</li>
+                        <li><i class="fas fa-envelope"></i> info@asilivia.tech</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 Asilivia Tech. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../scripts/main.js"></script>
+    <script src="../scripts/services.js"></script>
+</body>
+</html>

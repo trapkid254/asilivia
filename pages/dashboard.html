@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard - Asilivia Tech</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/dashboard.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <a href="../index.html" class="logo">Asilivia<span>Tech</span></a>
+            
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <nav>
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="products.html">Products</a></li>
+                    <li><a href="services.html">Repair Services</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="blog.html">Blog</a></li>
+                    <li><a href="booking.html">Booking</a></li>
+                    <li><a href="dashboard.html" class="active">Dashboard</a></li>
+                </ul>
+            </nav>
+            
+            <div class="header-actions">
+                <a href="dashboard.html" class="active"><i class="fas fa-user"></i></a>
+                <a href="cart.html" class="cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Dashboard Section -->
+    <section class="dashboard-page">
+        <div class="container">
+            <h2 class="section-title">My <span>Dashboard</span></h2>
+            
+            <div class="dashboard-container">
+                <div class="dashboard-sidebar">
+                    <h3>My Account</h3>
+                    <ul class="dashboard-menu">
+                        <li><a href="#" data-section="overview" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                        <li><a href="#" data-section="orders"><i class="fas fa-shopping-bag"></i> Orders</a></li>
+                        <li><a href="#" data-section="repairs"><i class="fas fa-tools"></i> Repair Requests</a></li>
+                        <li><a href="#" data-section="addresses"><i class="fas fa-map-marker-alt"></i> Addresses</a></li>
+                        <li><a href="#" data-section="profile"><i class="fas fa-user"></i> Profile Details</a></li>
+                        <li><a href="#" data-section="password"><i class="fas fa-lock"></i> Change Password</a></li>
+                        <li><a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                    </ul>
+                </div>
+                
+                <div class="dashboard-content">
+                    <!-- Overview Section -->
+                    <div id="overview" class="dashboard-section active">
+                        <div class="dashboard-header">
+                            <h2>Dashboard Overview</h2>
+                            <p>Welcome back, John Doe! Here's what's happening with your orders and repair requests.</p>
+                        </div>
+                        
+                        <div class="overview-cards">
+                            <div class="overview-card">
+                                <div class="card-icon">
+                                    <i class="fas fa-shopping-bag"></i>
+                                </div>
+                                <div class="card-content">
+                                    <h3>5</h3>
+                                    <p>Total Orders</p>
+                                </div>
+                            </div>
+                            
+                            <div class="overview-card">
+                                <div class="card-icon">
+                                    <i class="fas fa-tools"></i>
+                                </div>
+                                <div class="card-content">
+                                    <h3>2</h3>
+                                    <p>Repair Requests</p>
+                                </div>
+                            </div>
+                            
+                            <div class="overview-card">
+                                <div class="card-icon">
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <div class="card-content">
+                                    <h3>4.5</h3>
+                                    <p>Average Rating</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="recent-activity">
+                            <h3>Recent Activity</h3>
+                            
+                            <div class="activity-list">
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h4>New order placed</h4>
+                                        <p>Order #ORD-1234 for $899.99</p>
+                                        <span class="activity-time">2 hours ago</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <i class="fas fa-tools"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h4>Repair request updated</h4>
+                                        <p>Your repair request #REP-1001 is now in progress</p>
+                                        <span class="activity-time">1 day ago</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h4>Review submitted</h4>
+                                        <p>You reviewed "Premium Smartphone XYZ"</p>
+                                        <span class="activity-time">3 days ago</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Orders Section -->
+                    <div id="orders" class="dashboard-section">
+                        <div class="dashboard-header">
+                            <h2>My Orders</h2>
+                            <p>View your order history and track recent orders</p>
+                        </div>
+                        
+                        <div class="table-container">
+                            <table class="orders-table">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Date</th>
+                                        <th>Items</th>
+                                        <th>Total</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>#ORD-1234</td>
+                                        <td>Oct 15, 2023</td>
+                                        <td>Premium Smartphone XYZ</td>
+                                        <td>$899.99</td>
+                                        <td><span class="order-status status-delivered">Delivered</span></td>
+                                        <td>
+                                            <button class="btn btn-small view-order-details" data-order="ORD-1234">View</button>
+                                        </td>
+                                    </tr>
+                                    
+                                    <tr>
+                                        <td>#ORD-1235</td>
+                                        <td>Oct 10, 2023</td>
+                                        <td>Wireless Headphones, Smartwatch</td>
+                                        <td>$449.98</td>
+                                        <td><span class="order-status status-shipped">Shipped</span></td>
+                                        <td>
+                                            <button class="btn btn-small view-order-details" data-order="ORD-1235">View</button>
+                                        </td>
+                                    </tr>
+                                    
+                                    <tr>
+                                        <td>#ORD-1236</td>
+                                        <td>Oct 5, 2023</td>
+                                        <td>Laptop Pro 2023</td>
+                                        <td>$1299.99</td>
+                                        <td><span class="order-status status-processing">Processing</span></td>
+                                        <td>
+                                            <button class="btn btn-small view-order-details" data-order="ORD-1236">View</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Repair Requests Section -->
+                    <div id="repairs" class="dashboard-section">
+                        <div class="dashboard-header">
+                            <h2>My Repair Requests</h2>
+                            <p>Track the status of your device repairs</p>
+                        </div>
+                        
+                        <div class="repair-requests">
+                            <div class="repair-card">
+                                <div class="repair-header">
+                                    <span class="repair-id">#REP-1001</span>
+                                    <span class="repair-date">October 12, 2023</span>
+                                </div>
+                                <div class="repair-details">
+                                    <h4>iPhone 12 Screen Replacement</h4>
+                                    <p>Status: <span class="status-completed">Completed</span></p>
+                                    <p>Estimated Cost: $120.00</p>
+                                </div>
+                                <div class="repair-actions">
+                                    <button class="btn btn-small view-repair-details" data-repair="REP-1001">View Details</button>
+                                    <button class="btn btn-small btn-secondary">Download Invoice</button>
+                                </div>
+                            </div>
+                            
+                            <div class="repair-card">
+                                <div class="repair-header">
+                                    <span class="repair-id">#REP-1002</span>
+                                    <span class="repair-date">October 18, 2023</span>
+                                </div>
+                                <div class="repair-details">
+                                    <h4>MacBook Pro Keyboard Issues</h4>
+                                    <p>Status: <span class="status-in-progress">In Progress</span></p>
+                                    <p>Estimated Cost: $200.00 - $250.00</p>
+                                </div>
+                                <div class="repair-actions">
+                                    <button class="btn btn-small view-repair-details" data-repair="REP-1002">View Details</button>
+                                    <button class="btn btn-small btn-secondary">Contact Support</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Addresses Section -->
+                    <div id="addresses" class="dashboard-section">
+                        <div class="dashboard-header">
+                            <h2>My Addresses</h2>
+                            <p>Manage your shipping addresses</p>
+                        </div>
+                        
+                        <div class="address-cards">
+                            <div class="address-card">
+                                <h4>Primary Address</h4>
+                                <p>John Doe</p>
+                                <p>123 Main Street</p>
+                                <p>Nairobi, Kenya 00100</p>
+                                <p>+254 700 123 456</p>
+                                
+                                <div class="address-actions">
+                                    <button class="btn btn-small">Edit</button>
+                                    <button class="btn btn-small btn-secondary">Set as Default</button>
+                                </div>
+                            </div>
+                            
+                            <div class="address-card">
+                                <h4>Work Address</h4>
+                                <p>John Doe</p>
+                                <p>456 Business Avenue</p>
+                                <p>Westlands, Nairobi, Kenya 00100</p>
+                                <p>+254 711 987 654</p>
+                                
+                                <div class="address-actions">
+                                    <button class="btn btn-small">Edit</button>
+                                    <button class="btn btn-small btn-secondary">Set as Default</button>
+                                </div>
+                            </div>
+                            
+                            <button class="btn btn-accent">Add New Address</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Profile Section -->
+                    <div id="profile" class="dashboard-section">
+                        <div class="dashboard-header">
+                            <h2>Profile Details</h2>
+                            <p>Manage your personal information</p>
+                        </div>
+                        
+                        <form id="profileForm" class="profile-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="profileFirstName">First Name</label>
+                                    <input type="text" id="profileFirstName" name="firstName" value="John" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="profileLastName">Last Name</label>
+                                    <input type="text" id="profileLastName" name="lastName" value="Doe" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="profileEmail">Email Address</label>
+                                <input type="email" id="profileEmail" name="email" value="john.doe@example.com" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="profilePhone">Phone Number</label>
+                                <input type="tel" id="profilePhone" name="phone" value="+254700123456" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="profileBirthdate">Date of Birth</label>
+                                <input type="date" id="profileBirthdate" name="birthdate" value="1990-01-15">
+                            </div>
+                            
+                            <button type="submit" class="btn btn-accent">Save Changes</button>
+                        </form>
+                    </div>
+                    
+                    <!-- Password Section -->
+                    <div id="password" class="dashboard-section">
+                        <div class="dashboard-header">
+                            <h2>Change Password</h2>
+                            <p>Update your password to keep your account secure</p>
+                        </div>
+                        
+                        <form id="passwordForm" class="profile-form">
+                            <div class="form-group">
+                                <label for="currentPassword">Current Password</label>
+                                <input type="password" id="currentPassword" name="currentPassword" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="newPassword">New Password</label>
+                                <input type="password" id="newPassword" name="newPassword" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="confirmPassword">Confirm New Password</label>
+                                <input type="password" id="confirmPassword" name="confirmPassword" required>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-accent">Update Password</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h3>Asilivia Tech</h3>
+                    <p>Your one-stop solution for all electronics shopping and repair needs.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Shop</h3>
+                    <ul>
+                        <li><a href="products.html?category=mobiles">Mobile Phones</a></li>
+                        <li><a href="products.html?category=laptops">Laptops</a></li>
+                        <li><a href="products.html?category=accessories">Accessories</a></li>
+                        <li><a href="products.html?category=refurbished">Refurbished Devices</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Services</h3>
+                    <ul>
+                        <li><a href="services.html">Phone Repair</a></li>
+                        <li><a href="services.html">Laptop Repair</a></li>
+                        <li><a href="services.html">Other Device Repair</a></li>
+                        <li><a href="booking.html">Book a Repair</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Contact Us</h3>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> Narok Town, Narok</li>
+                        <li><i class="fas fa-phone"></i> +254 799 220 210</li>
+                        <li><i class="fas fa-envelope"></i> info@asilivia.tech</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 Asilivia Tech. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../scripts/main.js"></script>
+    <script src="../scripts/dashboard.js"></script>
+</body>
+</html>

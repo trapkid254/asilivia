@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - Asilivia Tech</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/products.css">
+    <link rel="stylesheet" href="../styles/product-detail.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <a href="../index.html" class="logo">Asilivia<span>Tech</span></a>
+            
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <nav>
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="products.html">Products</a></li>
+                    <li><a href="services.html">Repair Services</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="blog.html">Blog</a></li>
+                    <li><a href="booking.html">Booking</a></li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                </ul>
+            </nav>
+            
+            <div class="header-actions">
+                <a href="login.html"><i class="fas fa-user"></i></a>
+                <a href="cart.html" class="cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Product Detail Section -->
+    <section class="product-detail-page">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="../index.html">Home</a> > 
+                <a href="products.html">Products</a> > 
+                <span>Premium Smartphone XYZ</span>
+            </div>
+            
+            <div class="product-detail-container">
+                <div class="product-gallery">
+                    <div class="main-image">
+                        <img src="../assets/images/placeholder-smartphone.jpg" alt="Premium Smartphone XYZ" id="mainProductImage" onerror="this.src='https://via.placeholder.com/500x500?text=Product+Image'">
+                    </div>
+                    <div class="thumbnail-images">
+                        <div class="thumbnail active">
+                            <img src="../assets/images/placeholder-smartphone.jpg" alt="Thumbnail 1" onerror="this.src='https://via.placeholder.com/100x100?text=Thumb+1'">
+                        </div>
+                        <div class="thumbnail">
+                            <img src="../assets/images/placeholder-smartphone-2.jpg" alt="Thumbnail 2" onerror="this.src='https://via.placeholder.com/100x100?text=Thumb+2'">
+                        </div>
+                        <div class="thumbnail">
+                            <img src="../assets/images/placeholder-smartphone-3.jpg" alt="Thumbnail 3" onerror="this.src='https://via.placeholder.com/100x100?text=Thumb+3'">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="product-info">
+                    <h1>Premium Smartphone XYZ</h1>
+                    <div class="product-rating">
+                        <div class="stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <span class="rating-value">4.5 (128 reviews)</span>
+                    </div>
+                    
+                    <div class="product-price">
+                        <span class="current-price">KSh 899.99</span>
+                        <span class="original-price">KSh 999.99</span>
+                        <span class="discount">10% off</span>
+                    </div>
+                    
+                    <div class="product-description">
+                        <p>The Premium Smartphone XYZ features a stunning 6.7-inch Super Retina XDR display, powerful A15 Bionic chip, and an advanced dual-camera system. With all-day battery life and durable design, it's the perfect smartphone for work and play.</p>
+                    </div>
+                    
+                    <div class="product-options">
+                        <div class="option-group">
+                            <label>Color:</label>
+                            <div class="color-options">
+                                <div class="color-option active" data-color="midnight" style="background-color: #1a1a1a;"></div>
+                                <div class="color-option" data-color="starlight" style="background-color: #faf7f2;"></div>
+                                <div class="color-option" data-color="blue" style="background-color: #215e7e;"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="option-group">
+                            <label for="storage">Storage:</label>
+                            <select id="storage">
+                                <option value="128gb">128GB</option>
+                                <option value="256gb">256GB (+KSh 100)</option>
+                                <option value="512gb">512GB (+KSh 200)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="product-actions">
+                        <div class="quantity-selector">
+                            <label for="quantity">Quantity:</label>
+                            <div class="quantity-controls">
+                                <button class="qty-btn minus">-</button>
+                                <input type="number" id="quantity" value="1" min="1">
+                                <button class="qty-btn plus">+</button>
+                            </div>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <button class="btn btn-accent add-to-cart-btn">
+                                <i class="fas fa-shopping-cart"></i> Add to Cart
+                            </button>
+                            <button class="btn buy-now-btn">Buy Now</button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-truck"></i>
+                            <span>Free delivery within Nairobi</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-undo"></i>
+                            <span>30-day return policy</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>1-year warranty</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="product-details-tabs">
+                <div class="tabs-header">
+                    <button class="tab-link active" data-tab="description">Description</button>
+                    <button class="tab-link" data-tab="specifications">Specifications</button>
+                    <button class="tab-link" data-tab="reviews">Reviews</button>
+                </div>
+                
+                <div class="tabs-content">
+                    <div id="description" class="tab-content active">
+                        <h3>Product Description</h3>
+                        <p>The Premium Smartphone XYZ is designed to provide an exceptional user experience with its cutting-edge technology and sleek design. Whether you're capturing stunning photos, playing graphics-intensive games, or staying productive on the go, this smartphone delivers outstanding performance.</p>
+                        
+                        <h4>Key Features:</h4>
+                        <ul>
+                            <li>6.7-inch Super Retina XDR display with ProMotion technology</li>
+                            <li>A15 Bionic chip with 6-core CPU and 5-core GPU</li>
+                            <li>Advanced dual-camera system with 12MP Wide and Ultra Wide cameras</li>
+                            <li>12MP TrueDepth front camera with Night mode</li>
+                            <li>5G connectivity for faster downloads and streaming</li>
+                            <li>All-day battery life with up to 28 hours of video playback</li>
+                            <li>Ceramic Shield front cover for superior durability</li>
+                            <li>iOS operating system with regular security updates</li>
+                        </ul>
+                    </div>
+                    
+                    <div id="specifications" class="tab-content">
+                        <h3>Technical Specifications</h3>
+                        <table class="specs-table">
+                            <tr>
+                                <th>Display</th>
+                                <td>6.7-inch Super Retina XDR display, 2778 x 1284 pixels</td>
+                            </tr>
+                            <tr>
+                                <th>Chip</th>
+                                <td>A15 Bionic chip with 6-core CPU, 5-core GPU, and 16-core Neural Engine</td>
+                            </tr>
+                            <tr>
+                                <th>Camera</th>
+                                <td>Dual 12MP camera system ( Wide and Ultra Wide), Night mode, Deep Fusion, Smart HDR 4</td>
+                            </tr>
+                            <tr>
+                                <th>Front Camera</th>
+                                <td>12MP TrueDepth camera with Night mode and Deep Fusion</td>
+                            </tr>
+                            <tr>
+                                <th>Video Recording</th>
+                                <td>4K video recording at 24 fps, 25 fps, 30 fps, or 60 fps</td>
+                            </tr>
+                            <tr>
+                                <th>Battery</th>
+                                <td>Built-in rechargeable lithium-ion battery, Up to 28 hours video playback</td>
+                            </tr>
+                            <tr>
+                                <th>Connectivity</th>
+                                <td>5G, Wi-Fi 6, Bluetooth 5.0, NFC with reader mode</td>
+                            </tr>
+                            <tr>
+                                <th>Water Resistance</th>
+                                <td>IP68 rating (maximum depth of 6 meters up to 30 minutes)</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div id="reviews" class="tab-content">
+                        <h3>Customer Reviews</h3>
+                        <div class="review-summary">
+                            <div class="overall-rating">
+                                <div class="rating-value">4.5</div>
+                                <div class="stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                </div>
+                                <div class="total-reviews">Based on 128 reviews</div>
+                            </div>
+                            
+                            <div class="rating-bars">
+                                <div class="rating-bar">
+                                    <span>5 stars</span>
+                                    <div class="bar">
+                                        <div class="fill" style="width: 70%;"></div>
+                                    </div>
+                                    <span>70%</span>
+                                </div>
+                                <div class="rating-bar">
+                                    <span>4 stars</span>
+                                    <div class="bar">
+                                        <div class="fill" style="width: 20%;"></div>
+                                    </div>
+                                    <span>20%</span>
+                                </div>
+                                <div class="rating-bar">
+                                    <span>3 stars</span>
+                                    <div class="bar">
+                                        <div class="fill" style="width: 7%;"></div>
+                                    </div>
+                                    <span>7%</span>
+                                </div>
+                                <div class="rating-bar">
+                                    <span>2 stars</span>
+                                    <div class="bar">
+                                        <div class="fill" style="width: 2%;"></div>
+                                    </div>
+                                    <span>2%</span>
+                                </div>
+                                <div class="rating-bar">
+                                    <span>1 star</span>
+                                    <div class="bar">
+                                        <div class="fill" style="width: 1%;"></div>
+                                    </div>
+                                    <span>1%</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="reviews-list">
+                            <div class="review">
+                                <div class="review-header">
+                                    <div class="reviewer">John D.</div>
+                                    <div class="review-date">October 15, 2023</div>
+                                    <div class="review-rating">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                </div>
+                                <div class="review-title">Excellent phone!</div>
+                                <div class="review-content">
+                                    <p>This is by far the best phone I've ever owned. The camera quality is exceptional, battery life lasts all day, and the performance is smooth. Highly recommend!</p>
+                                </div>
+                            </div>
+                            
+                            <div class="review">
+                                <div class="review-header">
+                                    <div class="reviewer">Sarah M.</div>
+                                    <div class="review-date">October 12, 2023</div>
+                                    <div class="review-rating">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                    </div>
+                                </div>
+                                <div class="review-title">Great but expensive</div>
+                                <div class="review-content">
+                                    <p>The phone is amazing in terms of features and performance. The only downside is the price, but you get what you pay for. The display is stunning and the cameras are professional quality.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="related-products">
+                <h2>You May Also Like</h2>
+                <div class="product-grid">
+                    <div class="product-card">
+                        <div class="product-img">
+                            <img src="../assets/images/placeholder-laptop.jpg" alt="Laptop" onerror="this.src='https://via.placeholder.com/250x200?text=Laptop'">
+                        </div>
+                        <div class="product-content">
+                            <h3 class="product-title">Ultrabook Pro 2023</h3>
+                            <div class="product-price">KSh 1299.99</div>
+                            <div class="product-actions">
+                                <a href="product-detail.html" class="btn">Details</a>
+                                <a href="#" class="btn btn-accent btn-add-to-cart">Add to Cart</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card">
+                        <div class="product-img">
+                            <img src="../assets/images/placeholder-headphones.jpg" alt="Headphones" onerror="this.src='https://via.placeholder.com/250x200?text=Headphones'">
+                        </div>
+                        <div class="product-content">
+                            <h3 class="product-title">Wireless Noise-Cancelling Headphones</h3>
+                            <div class="product-price">KSh 249.99</div>
+                            <div class="product-actions">
+                                <a href="product-detail.html" class="btn">Details</a>
+                                <a href="#" class="btn btn-accent btn-add-to-cart">Add to Cart</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card">
+                        <div class="product-img">
+                            <img src="../assets/images/placeholder-smartwatch.jpg" alt="Smartwatch" onerror="this.src='https://via.placeholder.com/250x200?text=Smartwatch'">
+                        </div>
+                        <div class="product-content">
+                            <h3 class="product-title">Smart Fitness Tracker</h3>
+                            <div class="product-price">KSh 199.99</div>
+                            <div class="product-actions">
+                                <a href="product-detail.html" class="btn">Details</a>
+                                <a href="#" class="btn btn-accent btn-add-to-cart">Add to Cart</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h3>Asilivia Tech</h3>
+                    <p>Your one-stop solution for all electronics shopping and repair needs.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Shop</h3>
+                    <ul>
+                        <li><a href="products.html?category=mobiles">Mobile Phones</a></li>
+                        <li><a href="products.html?category=laptops">Laptops</a></li>
+                        <li><a href="products.html?category=accessories">Accessories</a></li>
+                        <li><a href="products.html?category=refurbished">Refurbished Devices</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Services</h3>
+                    <ul>
+                        <li><a href="services.html">Phone Repair</a></li>
+                        <li><a href="services.html">Laptop Repair</a></li>
+                        <li><a href="services.html">Other Device Repair</a></li>
+                        <li><a href="booking.html">Book a Repair</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Contact Us</h3>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> Narok Town, Narok</li>
+                        <li><i class="fas fa-phone"></i> +254 799 220 210</li>
+                        <li><i class="fas fa-envelope"></i> info@asiliviatech.com</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 Asilivia Tech. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../scripts/main.js"></script>
+    <script src="../scripts/products.js"></script>
+</body>
+</html>

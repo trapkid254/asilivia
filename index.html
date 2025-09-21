@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asilivia Tech - Electronics Store & Repair Services</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/homepage.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <a href="index.html" class="logo">Asilivia<span>Tech</span></a>
+            
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="pages/products.html">Products</a></li>
+                    <li><a href="pages/services.html">Repair Services</a></li>
+                    <li><a href="pages/about.html">About Us</a></li>
+                    <li><a href="pages/contact.html">Contact</a></li>
+                    <li><a href="pages/blog.html">Blog</a></li>
+                    <li><a href="pages/booking.html">Booking</a></li>
+                    <li><a href="pages/dashboard.html">Dashboard</a></li>
+                </ul>
+            </nav>
+            
+            <div class="header-actions">
+                <a href="pages/login.html"><i class="fas fa-user"></i></a>
+                <a href="pages/cart.html" class="cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container hero-content">
+            <h1>Your One-Stop Tech Solution</h1>
+            <p>Discover the latest gadgets and get professional repair services for all your devices</p>
+            <div class="hero-buttons">
+                <a href="pages/products.html" class="btn">Shop Now</a>
+                <a href="pages/services.html" class="btn btn-accent">Book Repair</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="categories">
+        <div class="container">
+            <h2 class="section-title">Shop By <span>Category</span></h2>
+            <div class="category-grid">
+                <div class="category-card">
+                    <div class="category-img">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <div class="category-content">
+                        <h3>Mobile Phones</h3>
+                        <p>Latest smartphones and accessories</p>
+                        <a href="pages/products.html?category=mobiles" class="btn">Explore</a>
+                    </div>
+                </div>
+                
+                <div class="category-card">
+                    <div class="category-img">
+                        <i class="fas fa-laptop"></i>
+                    </div>
+                    <div class="category-content">
+                        <h3>Laptops</h3>
+                        <p>Powerful laptops for work and play</p>
+                        <a href="pages/products.html?category=laptops" class="btn">Explore</a>
+                    </div>
+                </div>
+                
+                <div class="category-card">
+                    <div class="category-img">
+                        <i class="fas fa-headphones"></i>
+                    </div>
+                    <div class="category-content">
+                        <h3>Accessories</h3>
+                        <p>Cables, cases, and more</p>
+                        <a href="pages/products.html?category=accessories" class="btn">Explore</a>
+                    </div>
+                </div>
+                
+                <div class="category-card">
+                    <div class="category-img">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <div class="category-content">
+                        <h3>Refurbished</h3>
+                        <p>Quality devices at great prices</p>
+                        <a href="pages/products.html?category=refurbished" class="btn">Explore</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Products -->
+    <section class="featured-products">
+        <div class="container">
+            <h2 class="section-title">Featured <span>Products</span></h2>
+            <div class="product-grid">
+                <div class="product-card">
+                    <div class="product-img">
+                        <img src="assets/images/placeholder-smartphone.jpg" alt="Smartphone" onerror="this.src='https://via.placeholder.com/250x200?text=Smartphone'">
+                    </div>
+                    <div class="product-content">
+                        <h3 class="product-title">Premium Smartphone XYZ</h3>
+                        <div class="product-price">KSh 899.99</div>
+                        <div class="product-actions">
+                            <a href="pages/product-detail.html" class="btn">Details</a>
+                            <a href="#" class="btn btn-accent btn-add-to-cart">Add to Cart</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-img">
+                        <img src="assets/images/placeholder-laptop.jpg" alt="Laptop" onerror="this.src='https://via.placeholder.com/250x200?text=Laptop'">
+                    </div>
+                    <div class="product-content">
+                        <h3 class="product-title">Ultrabook Pro 2023</h3>
+                        <div class="product-price">KSh 1299.99</div>
+                        <div class="product-actions">
+                            <a href="pages/product-detail.html" class="btn">Details</a>
+                            <a href="#" class="btn btn-accent btn-add-to-cart">Add to Cart</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-img">
+                        <img src="assets/images/placeholder-headphones.jpg" alt="Headphones" onerror="this.src='https://via.placeholder.com/250x200?text=Headphones'">
+                    </div>
+                    <div class="product-content">
+                        <h3 class="product-title">Wireless Noise-Cancelling Headphones</h3>
+                        <div class="product-price">KSh 249.99</div>
+                        <div class="product-actions">
+                            <a href="pages/product-detail.html" class="btn">Details</a>
+                            <a href="#" class="btn btn-accent btn-add-to-cart">Add to Cart</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-img">
+                        <img src="assets/images/placeholder-smartwatch.jpg" alt="Smartwatch" onerror="this.src='https://via.placeholder.com/250x200?text=Smartwatch'">
+                    </div>
+                    <div class="product-content">
+                        <h3 class="product-title">Smart Fitness Tracker</h3>
+                        <div class="product-price">KSh 199.99</div>
+                        <div class="product-actions">
+                            <a href="pages/product-detail.html" class="btn">Details</a>
+                            <a href="#" class="btn btn-accent btn-add-to-cart">Add to Cart</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services">
+        <div class="container">
+            <h2 class="section-title">Our <span>Repair Services</span></h2>
+            <div class="service-cards">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Phone Repair</h3>
+                    <p>Screen replacement, battery issues, water damage, and more for all smartphone models.</p>
+                    <a href="pages/services.html" class="btn">Learn More</a>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-laptop"></i>
+                    </div>
+                    <h3>Laptop Repair</h3>
+                    <p>Hardware upgrades, screen repairs, keyboard issues, and software problems.</p>
+                    <a href="pages/services.html" class="btn">Learn More</a>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <h3>Other Devices</h3>
+                    <p>Repair services for tablets, smartwatches, gaming consoles, and other electronics.</p>
+                    <a href="pages/services.html" class="btn">Learn More</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="container">
+            <h2 class="section-title">What Our <span>Customers Say</span></h2>
+            <div class="testimonial-grid">
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"The screen replacement service was quick and affordable. My phone looks brand new again!"</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">JD</div>
+                        <div>
+                            <h4>John Doe</h4>
+                            <p>Phone Repair Customer</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"I bought my laptop from Asilivia Tech and the service was exceptional. Great prices and fast delivery."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">SM</div>
+                        <div>
+                            <h4>Sarah Miller</h4>
+                            <p>Laptop Customer</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"The technicians fixed my water-damaged phone when others said it was impossible. Highly recommended!"</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">RJ</div>
+                        <div>
+                            <h4>Robert Johnson</h4>
+                            <p>Repair Service Customer</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container cta-content">
+            <h2>Need Help With Your Device?</h2>
+            <p>Book a repair service today and get your devices working like new again with our expert technicians.</p>
+            <a href="pages/booking.html" class="btn btn-accent">Book Repair Now</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h3>Asilivia Tech</h3>
+                    <p>Your one-stop solution for all electronics shopping and repair needs.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Shop</h3>
+                    <ul>
+                        <li><a href="pages/products.html?category=mobiles">Mobile Phones</a></li>
+                        <li><a href="pages/products.html?category=laptops">Laptops</a></li>
+                        <li><a href="pages/products.html?category=accessories">Accessories</a></li>
+                        <li><a href="pages/products.html?category=refurbished">Refurbished Devices</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Services</h3>
+                    <ul>
+                        <li><a href="pages/services.html">Phone Repair</a></li>
+                        <li><a href="pages/services.html">Laptop Repair</a></li>
+                        <li><a href="pages/services.html">Other Device Repair</a></li>
+                        <li><a href="pages/booking.html">Book a Repair</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Contact Us</h3>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> Narok Town, Narok</li>
+                        <li><i class="fas fa-phone"></i> +254 799 220 210</li>
+                        <li><i class="fas fa-envelope"></i> info@asiliviatech.com</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 Asilivia Tech. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="scripts/main.js"></script>
+    <script src="scripts/homepage.js"></script>
+</body>
+</html>
