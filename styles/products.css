@@ -158,6 +158,19 @@
     gap: 10px;
 }
 
+/* Stock badges */
+.badge { display:inline-block; padding:4px 8px; border-radius:999px; font-size:.75rem; font-weight:600; }
+.badge-success { background:#e8f7ee; color:#0f8a2c; border:1px solid #c9efda; }
+.badge-danger { background:#fde8e8; color:#b91c1c; border:1px solid #f5c2c2; }
+
+/* Disabled add-to-cart visual */
+.btn.disabled,
+.btn[aria-disabled="true"] {
+    pointer-events: none;
+    opacity: .6;
+    filter: grayscale(20%);
+}
+
 .pagination {
     display: flex;
     justify-content: center;

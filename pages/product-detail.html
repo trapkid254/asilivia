@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Details - Asilivia Tech</title>
+    <title>Product Details - Aslivia Tech</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../styles/main.css">
     <link rel="stylesheet" href="../styles/products.css">
@@ -14,7 +14,7 @@
     <!-- Header -->
     <header>
         <div class="container header-container">
-            <a href="../index.html" class="logo">Asilivia<span>Tech</span></a>
+            <a href="../index.html" class="logo">Aslivia<span>Tech</span></a>
             
             <button class="mobile-menu-btn">
                 <i class="fas fa-bars"></i>
@@ -49,13 +49,13 @@
             <div class="breadcrumb">
                 <a href="../index.html">Home</a> > 
                 <a href="products.html">Products</a> > 
-                <span>Premium Smartphone XYZ</span>
+                <span id="breadcrumbProductName">Product</span>
             </div>
             
             <div class="product-detail-container">
                 <div class="product-gallery">
                     <div class="main-image">
-                        <img src="../assets/images/placeholder-smartphone.jpg" alt="Premium Smartphone XYZ" id="mainProductImage" onerror="this.src='https://via.placeholder.com/500x500?text=Product+Image'">
+                        <img src="../assets/images/placeholder-smartphone.jpg" alt="Product Image" id="mainProductImage" onerror="this.src='https://via.placeholder.com/500x500?text=Product+Image'">
                     </div>
                     <div class="thumbnail-images">
                         <div class="thumbnail active">
@@ -71,7 +71,7 @@
                 </div>
                 
                 <div class="product-info">
-                    <h1>Premium Smartphone XYZ</h1>
+                    <h1 id="productTitle">Product</h1>
                     <div class="product-rating">
                         <div class="stars">
                             <i class="fas fa-star"></i>
@@ -84,13 +84,11 @@
                     </div>
                     
                     <div class="product-price">
-                        <span class="current-price">KSh 899.99</span>
-                        <span class="original-price">KSh 999.99</span>
-                        <span class="discount">10% off</span>
+                        <span class="current-price" id="productPrice">KSh 0.00</span>
                     </div>
                     
                     <div class="product-description">
-                        <p>The Premium Smartphone XYZ features a stunning 6.7-inch Super Retina XDR display, powerful A15 Bionic chip, and an advanced dual-camera system. With all-day battery life and durable design, it's the perfect smartphone for work and play.</p>
+                        <p id="productDescription">Product description will appear here.</p>
                     </div>
                     
                     <div class="product-options">
@@ -124,17 +122,17 @@
                         </div>
                         
                         <div class="action-buttons">
-                            <button class="btn btn-accent add-to-cart-btn">
+                            <button class="btn btn-accent add-to-cart-btn" id="addToCartBtn">
                                 <i class="fas fa-shopping-cart"></i> Add to Cart
                             </button>
                             <button class="btn buy-now-btn">Buy Now</button>
                         </div>
                     </div>
                     
-                    <div class="product-meta">
+                    <div class="product-meta" id="productMeta">
                         <div class="meta-item">
                             <i class="fas fa-truck"></i>
-                            <span>Free delivery within Nairobi</span>
+                            <span>Delivery available countrywide</span>
                         </div>
                         <div class="meta-item">
                             <i class="fas fa-undo"></i>
@@ -360,10 +358,11 @@
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-column">
-                    <h3>Asilivia Tech</h3>
+                    <h3>Aslivia Tech</h3>
                     <p>Your one-stop solution for all electronics shopping and repair needs.</p>
                     <div class="social-links">
-                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="https://www.facebook.com/peninsilvana.mepoclares" target="_blank" rel="noopener"><i class="fab fa-facebook"></i></a>
+                        <a href="https://www.tiktok.com/@aslivia373?_r=1&_d=ed20kmgjef793k&sec_uid=MS4wLjABAAAAAKnX6AWPtQJqJdzMxI7VVyGLsrmboLLlOxGMlrrpt3aEDT1K4p4mpgIFNTnY7bIw&share_author_id=7024913671055344646&sharer_language=en&source=h5_m&u_code=dlcj759bg8hf1a&timestamp=1758565347&user_id=7024913671055344646&sec_user_id=MS4wLjABAAAAAKnX6AWPtQJqJdzMxI7VVyGLsrmboLLlOxGMlrrpt3aEDT1K4p4mpgIFNTnY7bIw&item_author_type=1&utm_source=whatsapp&utm_campaign=client_share&utm_medium=android&share_iid=7551446116957652748&share_link_id=538aaf9f-2182-451e-811a-23c42821f226&share_app_id=1233&ugbiz_name=ACCOUNT&ug_btm=b8727%2Cb7360&social_share_type=5&enable_checksum=1" target="_blank" rel="noopener"><i class="fab fa-tiktok"></i></a>
                         <a href="#"><i class="fab fa-twitter"></i></a>
                         <a href="#"><i class="fab fa-instagram"></i></a>
                         <a href="#"><i class="fab fa-linkedin"></i></a>
@@ -395,18 +394,92 @@
                     <ul>
                         <li><i class="fas fa-map-marker-alt"></i> Narok Town, Narok</li>
                         <li><i class="fas fa-phone"></i> +254 799 220 210</li>
-                        <li><i class="fas fa-envelope"></i> info@asiliviatech.com</li>
+                        <li><i class="fas fa-envelope"></i> pmepoclares@gmail.com</li>
                     </ul>
                 </div>
             </div>
             
             <div class="footer-bottom">
-                <p>&copy; 2025 Asilivia Tech. All rights reserved.</p>
+                <p>&copy; 2025 Aslivia Tech. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
+    <script src="../scripts/data-manager.js"></script>
     <script src="../scripts/main.js"></script>
-    <script src="../scripts/products.js"></script>
+    <script>
+    (function(){
+        function qs(name){
+            const p=new URLSearchParams(window.location.search);return p.get(name);
+        }
+        function formatPrice(ksh){
+            const n = Number(ksh||0);return 'KSh ' + n.toFixed(2);
+        }
+        function renderProduct(p){
+            if(!p) return;
+            const titleEl = document.getElementById('productTitle');
+            const imgEl = document.getElementById('mainProductImage');
+            const priceEl = document.getElementById('productPrice');
+            const descEl = document.getElementById('productDescription');
+            const breadcrumbEl = document.getElementById('breadcrumbProductName');
+            const metaEl = document.getElementById('productMeta');
+            const addBtn = document.getElementById('addToCartBtn');
+
+            if(titleEl) titleEl.textContent = p.name || 'Product';
+            if(breadcrumbEl) breadcrumbEl.textContent = p.name || 'Product';
+            if(imgEl) imgEl.src = p.image || '../assets/images/placeholder-smartphone.jpg';
+            if(priceEl) priceEl.textContent = formatPrice(p.price);
+            if(descEl) descEl.textContent = p.description || '';
+
+            // Stock badge
+            const stock = Number(p.stock)||0;
+            const stockItem = document.createElement('div');
+            stockItem.className = 'meta-item';
+            stockItem.innerHTML = `<i class="fas fa-box"></i><span>Stock: ${stock}</span>`;
+            if(metaEl) metaEl.prepend(stockItem);
+
+            // Wire add to cart button
+            if(addBtn){
+                addBtn.dataset.id = p.id;
+                if (stock <= 0){
+                    addBtn.classList.add('disabled');
+                    addBtn.setAttribute('aria-disabled','true');
+                    addBtn.textContent = 'Out of Stock';
+                }
+                addBtn.addEventListener('click', function(e){
+                    e.preventDefault();
+                    if (stock <= 0) return;
+                    // Expect initializeCart/addToCart helpers in main.js
+                    if (typeof window.addToCart === 'function') {
+                        window.addToCart({ id: p.id, name: p.name, price: p.price, image: p.image, qty: 1 });
+                    } else {
+                        // Fallback simple cart in localStorage
+                        try {
+                            const raw = localStorage.getItem('cart');
+                            const items = raw ? JSON.parse(raw) : [];
+                            const idx = items.findIndex(it=>it.id===p.id);
+                            if(idx>-1){ items[idx].qty = (parseInt(items[idx].qty)||0)+1; }
+                            else { items.push({ id:p.id, name:p.name, price:p.price, image:p.image, qty:1 }); }
+                            localStorage.setItem('cart', JSON.stringify(items));
+                            localStorage.setItem('cartCount', String(items.reduce((s,it)=>s+(parseInt(it.qty)||0),0)));
+                            const cc=document.querySelector('.cart-count'); if(cc) cc.textContent=localStorage.getItem('cartCount')||'0';
+                            alert('Added to cart');
+                        } catch(_) {}
+                    }
+                });
+            }
+        }
+
+        function init(){
+            const id = qs('id');
+            if (!id || !window.dataManager){ return; }
+            const product = (window.dataManager.getProducts()||[]).find(p=>p.id===id);
+            renderProduct(product);
+        }
+
+        if (window.dataManager) init();
+        else window.addEventListener('load', init);
+    })();
+    </script>
 </body>
 </html>

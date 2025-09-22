@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Ensure data manager is available (loaded in dashboard.html)
+    const hasDM = typeof window.dataManager !== 'undefined';
+
     // Dashboard navigation
     const dashboardLinks = document.querySelectorAll('.dashboard-menu a');
     const dashboardSections = document.querySelectorAll('.dashboard-section');
@@ -27,12 +30,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const table = document.querySelector('#orders table.orders-table tbody');
         if (!table) return;
         // Fetch orders
-        let orders = [];
-        try {
-            const raw = localStorage.getItem('orders');
-            const parsed = raw ? JSON.parse(raw) : [];
-            if (Array.isArray(parsed)) orders = parsed;
-        } catch (e) { /* ignore */ }
+        let orders = hasDM ? window.dataManager.getOrders() : [];
+        if (!hasDM) {
+            try {
+                const raw = localStorage.getItem('orders');
+                const parsed = raw ? JSON.parse(raw) : [];
+                if (Array.isArray(parsed)) orders = parsed;
+            } catch (e) { /* ignore */ }
+        }
         // Filter to current customer only (by email or phone)
         let current = null;
         try {
@@ -76,12 +81,106 @@ document.addEventListener('DOMContentLoaded', function() {
                 <td>${dateStr}</td>
                 <td>${itemsLabel}</td>
                 <td>${totalStr}</td>
-                <td><span class="order-status status-processing">${order.status || 'Processing'}</span></td>
+                <td><span class="order-status status-${(order.status||'processing').toLowerCase()}">${order.status || 'Processing'}</span></td>
                 <td>
                     <button class="btn btn-small view-order-details" data-order="${order.id}">View</button>
                 </td>`;
             table.appendChild(tr);
         });
+    }
+
+    // Render bookings into Repairs section
+    function renderBookings() {
+        const container = document.querySelector('#repairs .repair-requests');
+        if (!container) return;
+        let bookings = hasDM ? window.dataManager.getBookings() : [];
+        if (!hasDM) {
+            try {
+                const raw = localStorage.getItem('bookings');
+                const parsed = raw ? JSON.parse(raw) : [];
+                if (Array.isArray(parsed)) bookings = parsed;
+            } catch(e) { /* ignore */ }
+        }
+        // Filter to current customer only
+        let current = null;
+        try {
+            const rawC = localStorage.getItem('currentCustomer');
+            const parsedC = rawC ? JSON.parse(rawC) : null;
+            if (parsedC && (parsedC.email || parsedC.phone)) current = parsedC;
+        } catch (e) { /* ignore */ }
+        if (current) {
+            const email = String(current.email || '').trim().toLowerCase();
+            const phone = String(current.phone || '').replace(/\s+/g,'');
+            bookings = bookings.filter(b => {
+                const ce = String(b?.customer?.email || '').trim().toLowerCase();
+                const cp = String(b?.customer?.phone || '').replace(/\s+/g,'');
+                return (email && ce === email) || (phone && cp === phone);
+            });
+        } else {
+            bookings = [];
+        }
+
+        container.innerHTML = '';
+        if (!bookings.length) {
+            const empty = document.createElement('p');
+            empty.textContent = 'No repair bookings yet.';
+            container.appendChild(empty);
+            return;
+        }
+
+        bookings.slice().reverse().forEach(b => {
+            const created = b.createdAt ? new Date(b.createdAt).toLocaleDateString() : '';
+            const title = `${b.device?.brand || ''} ${b.device?.model || ''} - ${b.issue?.type || 'Repair'}`.trim();
+            const statusClass = (b.status || 'pending').toLowerCase().replace(/\s+/g,'-');
+            const card = document.createElement('div');
+            card.className = 'repair-card';
+            card.innerHTML = `
+                <div class="repair-header">
+                    <span class="repair-id">${b.id || ''}</span>
+                    <span class="repair-date">${created}</span>
+                </div>
+                <div class="repair-details">
+                    <h4>${title}</h4>
+                    <p>Status: <span class="status-${statusClass}">${b.status || 'Pending'}</span></p>
+                    <p>Urgency: ${b.service?.urgency || 'standard'}</p>
+                </div>
+                <div class="repair-actions">
+                    <button class="btn btn-small view-repair-details" data-repair="${b.id}">View Details</button>
+                </div>`;
+            container.appendChild(card);
+        });
+    }
+
+    // Update overview cards based on current user data
+    function updateOverview() {
+        const totalOrdersEl = document.querySelector('#overview .overview-cards .overview-card:nth-child(1) h3');
+        const totalRepairsEl = document.querySelector('#overview .overview-cards .overview-card:nth-child(2) h3');
+
+        // Reuse filtered data by calling render functions' internals lightly
+        let orders = hasDM ? window.dataManager.getOrders() : [];
+        let bookings = hasDM ? window.dataManager.getBookings() : [];
+        let current = null;
+        try {
+            const rawC = localStorage.getItem('currentCustomer');
+            const parsedC = rawC ? JSON.parse(rawC) : null;
+            if (parsedC && (parsedC.email || parsedC.phone)) current = parsedC;
+        } catch (e) { /* ignore */ }
+        if (current) {
+            const email = String(current.email || '').trim().toLowerCase();
+            const phone = String(current.phone || '').replace(/\s+/g,'');
+            const filtByCust = (arr) => arr.filter(x => {
+                const ce = String(x?.customer?.email || '').trim().toLowerCase();
+                const cp = String(x?.customer?.phone || '').replace(/\s+/g,'');
+                return (email && ce === email) || (phone && cp === phone);
+            });
+            orders = filtByCust(orders);
+            bookings = filtByCust(bookings);
+        } else {
+            orders = [];
+            bookings = [];
+        }
+        if (totalOrdersEl) totalOrdersEl.textContent = String(orders.length);
+        if (totalRepairsEl) totalRepairsEl.textContent = String(bookings.length);
     }
 
     // Order details modal
@@ -140,6 +239,18 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize
     renderOrders();
+    renderBookings();
+    updateOverview();
+
+    // Live refresh when data changes
+    window.addEventListener('dataChanged', function(evt) {
+        const t = evt?.detail?.type;
+        if (t === 'orders' || t === 'bookings') {
+            renderOrders();
+            renderBookings();
+            updateOverview();
+        }
+    });
     // If URL hash points to a section, open it
     function activateSectionByHash() {
         const hash = window.location.hash.replace('#', '');

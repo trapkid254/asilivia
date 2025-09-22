@@ -1,4 +1,14 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Load data manager
+    const script = document.createElement('script');
+    script.src = '../scripts/data-manager.js';
+    document.head.appendChild(script);
+    
+    // Wait for data manager to load
+    script.onload = function() {
+        initializeProducts();
+    };
+    
     // Price range slider
     const priceRange = document.getElementById('priceRange');
     const priceValue = document.getElementById('priceValue');
@@ -9,57 +19,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Sample product data
-    const products = [
-        {
-            id: 1,
-            name: "Premium Smartphone XYZ",
-            price: 899.99,
-            category: "mobiles",
-            brand: "apple",
-            image: "../assets/images/placeholder-smartphone.jpg"
-        },
-        {
-            id: 2,
-            name: "Ultrabook Pro 2023",
-            price: 1299.99,
-            category: "laptops",
-            brand: "dell",
-            image: "../assets/images/placeholder-laptop.jpg"
-        },
-        {
-            id: 3,
-            name: "Wireless Noise-Cancelling Headphones",
-            price: 249.99,
-            category: "accessories",
-            brand: "sony",
-            image: "../assets/images/placeholder-headphones.jpg"
-        },
-        {
-            id: 4,
-            name: "Smart Fitness Tracker",
-            price: 199.99,
-            category: "accessories",
-            brand: "samsung",
-            image: "../assets/images/placeholder-smartwatch.jpg"
-        },
-        {
-            id: 5,
-            name: "Gaming Laptop Extreme",
-            price: 1899.99,
-            category: "laptops",
-            brand: "hp",
-            image: "../assets/images/placeholder-laptop.jpg"
-        },
-        {
-            id: 6,
-            name: "Flagship Smartphone Pro",
-            price: 1099.99,
-            category: "mobiles",
-            brand: "samsung",
-            image: "../assets/images/placeholder-smartphone.jpg"
-        }
-    ];
+    // Products will be loaded from data manager
+    let products = [];
     
     // Render products
     function renderProducts(productsToRender) {
@@ -71,6 +32,8 @@ document.addEventListener('DOMContentLoaded', function() {
         productsToRender.forEach(product => {
             const productItem = document.createElement('div');
             productItem.className = 'product-item';
+            const stockNum = Number(product.stock)||0;
+            const outOfStock = stockNum <= 0;
             productItem.innerHTML = `
                 <div class="product-item-img">
                     <img src="${product.image}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/250x200?text=Product'">
@@ -78,9 +41,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="product-item-content">
                     <h3 class="product-item-title">${product.name}</h3>
                     <div class="product-item-price">KSh ${product.price.toFixed(2)}</div>
+                    <div class="product-item-stock">
+                        <span class="badge ${outOfStock?'badge-danger':'badge-success'}">${outOfStock?'Out of Stock':'In Stock: '+stockNum}</span>
+                    </div>
                     <div class="product-item-actions">
                         <a href="product-detail.html?id=${product.id}" class="btn">Details</a>
-                        <a href="#" class="btn btn-accent btn-add-to-cart" data-id="${product.id}">Add to Cart</a>
+                        <a href="#" class="btn btn-accent btn-add-to-cart ${outOfStock?'disabled':''}" data-id="${product.id}" ${outOfStock?'aria-disabled="true" tabindex="-1"':''}>${outOfStock?'Out of Stock':'Add to Cart'}</a>
                     </div>
                 </div>
             `;
@@ -89,23 +55,26 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // Reinitialize cart functionality for new buttons
-        initializeCart();
+        if (typeof initializeCart === 'function') {
+            initializeCart();
+        }
     }
     
     // Filter products
     function filterProducts() {
+        if (!window.dataManager) return;
+        
         const categoryFilters = Array.from(document.querySelectorAll('input[name="category"]:checked')).map(input => input.value);
         const brandFilters = Array.from(document.querySelectorAll('input[name="brand"]:checked')).map(input => input.value);
         const maxPrice = parseInt(priceRange.value);
         
-        const filteredProducts = products.filter(product => {
-            const categoryMatch = categoryFilters.length === 0 || categoryFilters.includes(product.category);
-            const brandMatch = brandFilters.length === 0 || brandFilters.includes(product.brand);
-            const priceMatch = product.price <= maxPrice;
-            
-            return categoryMatch && brandMatch && priceMatch;
-        });
+        const filters = {
+            category: categoryFilters,
+            brand: brandFilters,
+            maxPrice: maxPrice
+        };
         
+        const filteredProducts = window.dataManager.filterProducts(filters);
         renderProducts(filteredProducts);
         
         // Update product count
@@ -132,12 +101,15 @@ document.addEventListener('DOMContentLoaded', function() {
             priceRange.value = 5000;
             priceValue.textContent = 'KSh 5000';
             
-            renderProducts(products);
-            
-            // Update product count
-            const productCount = document.querySelector('.products-header p');
-            if (productCount) {
-                productCount.textContent = `Showing ${products.length} products`;
+            if (window.dataManager) {
+                const allProducts = window.dataManager.getActiveProducts();
+                renderProducts(allProducts);
+                
+                // Update product count
+                const productCount = document.querySelector('.products-header p');
+                if (productCount) {
+                    productCount.textContent = `Showing ${allProducts.length} products`;
+                }
             }
         });
     }
@@ -146,28 +118,43 @@ document.addEventListener('DOMContentLoaded', function() {
     const sortSelect = document.getElementById('sort');
     if (sortSelect) {
         sortSelect.addEventListener('change', function() {
-            const sortValue = this.value;
-            let sortedProducts = [...products];
+            if (!window.dataManager) return;
             
-            switch(sortValue) {
-                case 'price-low':
-                    sortedProducts.sort((a, b) => a.price - b.price);
-                    break;
-                case 'price-high':
-                    sortedProducts.sort((a, b) => b.price - a.price);
-                    break;
-                case 'name':
-                    sortedProducts.sort((a, b) => a.name.localeCompare(b.name));
-                    break;
-                default:
-                    // Default sorting (featured)
-                    break;
-            }
+            const sortValue = this.value;
+            const currentProducts = window.dataManager.getActiveProducts();
+            const sortedProducts = window.dataManager.sortProducts(currentProducts, sortValue);
             
             renderProducts(sortedProducts);
         });
     }
     
-    // Initial render
-    renderProducts(products);
+    // Initialize products functionality
+    function initializeProducts() {
+        if (window.dataManager) {
+            products = window.dataManager.getActiveProducts();
+            renderProducts(products);
+            
+            // Listen for product changes from admin
+            window.addEventListener('dataChanged', function(event) {
+                if (event.detail.type === 'products') {
+                    products = window.dataManager.getActiveProducts();
+                    renderProducts(products);
+                    
+                    // Update product count
+                    const productCount = document.querySelector('.products-header p');
+                    if (productCount) {
+                        productCount.textContent = `Showing ${products.length} products`;
+                    }
+                }
+            });
+        }
+    }
+    
+    // Fallback: try to initialize immediately if data manager is already loaded
+    if (window.dataManager) {
+        initializeProducts();
+    } else {
+        // Initial render with empty products if data manager not loaded yet
+        renderProducts([]);
+    }
 });
