@@ -26,25 +26,46 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Load orders from localStorage into Orders table
-    function renderOrders() {
+    async function renderOrders() {
         const table = document.querySelector('#orders table.orders-table tbody');
         if (!table) return;
-        // Fetch orders
-        let orders = hasDM ? window.dataManager.getOrders() : [];
-        if (!hasDM) {
+        // Fetch orders (backend first)
+        let orders = [];
+        // current already loaded above
+
+        if (window.api && current) {
             try {
-                const raw = localStorage.getItem('orders');
-                const parsed = raw ? JSON.parse(raw) : [];
-                if (Array.isArray(parsed)) orders = parsed;
-            } catch (e) { /* ignore */ }
+                const params = new URLSearchParams();
+                if (current.email) params.set('email', String(current.email).trim());
+                if (current.phone) params.set('phone', String(current.phone).trim());
+                const fetched = await window.api.getJSON('/api/orders?' + params.toString());
+                if (Array.isArray(fetched)) {
+                    orders = fetched.map(o => ({
+                        id: o._id || o.id,
+                        date: o.createdAt || o.date,
+                        items: Array.isArray(o.items)? o.items.map(i=>({name:i.name, qty:i.qty, price:i.price})) : [],
+                        total: Number(o.total)||0,
+                        status: o.status || 'pending',
+                        customer: o.customer || {}
+                    }));
+                }
+            } catch (_) { /* fallback below */ }
+        }
+
+        if (!orders.length) {
+            // Fallbacks
+            if (hasDM) {
+                orders = window.dataManager.getOrders();
+            } else {
+                try {
+                    const raw = localStorage.getItem('orders');
+                    const parsed = raw ? JSON.parse(raw) : [];
+                    if (Array.isArray(parsed)) orders = parsed;
+                } catch (e) { /* ignore */ }
+            }
         }
         // Filter to current customer only (by email or phone)
-        let current = null;
-        try {
-            const rawC = localStorage.getItem('currentCustomer');
-            const parsedC = rawC ? JSON.parse(rawC) : null;
-            if (parsedC && (parsedC.email || parsedC.phone)) current = parsedC;
-        } catch (e) { /* ignore */ }
+        // current already loaded above
         if (current) {
             const email = String(current.email || '').trim().toLowerCase();
             const phone = String(current.phone || '').replace(/\s+/g,'');
@@ -90,24 +111,41 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Render bookings into Repairs section
-    function renderBookings() {
+    async function renderBookings() {
         const container = document.querySelector('#repairs .repair-requests');
         if (!container) return;
-        let bookings = hasDM ? window.dataManager.getBookings() : [];
-        if (!hasDM) {
-            try {
-                const raw = localStorage.getItem('bookings');
-                const parsed = raw ? JSON.parse(raw) : [];
-                if (Array.isArray(parsed)) bookings = parsed;
-            } catch(e) { /* ignore */ }
-        }
-        // Filter to current customer only
+        let bookings = [];
+        // current customer
         let current = null;
         try {
             const rawC = localStorage.getItem('currentCustomer');
             const parsedC = rawC ? JSON.parse(rawC) : null;
             if (parsedC && (parsedC.email || parsedC.phone)) current = parsedC;
         } catch (e) { /* ignore */ }
+
+        // Backend first
+        if (window.api && current) {
+            try {
+                const params = new URLSearchParams();
+                if (current.email) params.set('email', String(current.email).trim());
+                if (current.phone) params.set('phone', String(current.phone).trim());
+                const fetched = await window.api.getJSON('/api/bookings?' + params.toString());
+                if (Array.isArray(fetched)) bookings = fetched;
+            } catch (_) { /* fallback below */ }
+        }
+        // Fallbacks
+        if (!bookings.length) {
+            if (hasDM) {
+                bookings = window.dataManager.getBookings();
+            } else {
+                try {
+                    const raw = localStorage.getItem('bookings');
+                    const parsed = raw ? JSON.parse(raw) : [];
+                    if (Array.isArray(parsed)) bookings = parsed;
+                } catch(e) { /* ignore */ }
+            }
+        }
+        // Filter to current customer only (current already loaded above)
         if (current) {
             const email = String(current.email || '').trim().toLowerCase();
             const phone = String(current.phone || '').replace(/\s+/g,'');

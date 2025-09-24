@@ -1,0 +1,25 @@
+# Netlify configuration for Silvia frontend
+# 1) Serves the site as a static SPA
+# 2) Optionally proxies API calls to your Render backend (update BACKEND_URL after deploy)
+
+[build]
+  publish = "."
+
+# Redirect all routes to index.html for SPA-style routing
+[[redirects]]
+  from = "/pages/*"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin/*"
+  to = "/index.html"
+  status = 200
+
+# Optional: uncomment and set your Render backend URL after deploying the backend
+# [[redirects]]
+#   from = "/api/*"
+#   to = "https://<your-render-service>.onrender.com/:splat"
+#   status = 200
+#   force = true
+#   headers = { X-Forwarded-By = "Netlify" }

@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Products will be loaded from data manager
+    // Products will be loaded from backend first, then fallback to data manager
     let products = [];
     
     // Render products
@@ -129,32 +129,50 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Initialize products functionality
-    function initializeProducts() {
-        if (window.dataManager) {
+    async function initializeProducts() {
+        // Try backend first
+        let loadedFromBackend = false;
+        if (window.api && typeof window.api.getJSON === 'function') {
+            try {
+                const fetched = await window.api.getJSON('/api/products?status=active');
+                if (Array.isArray(fetched)) {
+                    products = fetched.map(p => ({
+                        id: p._id || p.id,
+                        name: p.name,
+                        price: Number(p.price)||0,
+                        category: p.category||'',
+                        brand: p.brand||'',
+                        image: p.image||'../assets/images/placeholder-smartphone.jpg',
+                        description: p.description||'',
+                        stock: Number(p.stock)||0,
+                        status: p.status||'active',
+                    }));
+                    renderProducts(products);
+                    loadedFromBackend = true;
+                    const productCount = document.querySelector('.products-header p');
+                    if (productCount) productCount.textContent = `Showing ${products.length} products`;
+                }
+            } catch (_) { /* fallback below */ }
+        }
+
+        if (!loadedFromBackend && window.dataManager) {
             products = window.dataManager.getActiveProducts();
             renderProducts(products);
-            
             // Listen for product changes from admin
             window.addEventListener('dataChanged', function(event) {
                 if (event.detail.type === 'products') {
                     products = window.dataManager.getActiveProducts();
                     renderProducts(products);
-                    
-                    // Update product count
                     const productCount = document.querySelector('.products-header p');
-                    if (productCount) {
-                        productCount.textContent = `Showing ${products.length} products`;
-                    }
+                    if (productCount) productCount.textContent = `Showing ${products.length} products`;
                 }
             });
+            const productCount = document.querySelector('.products-header p');
+            if (productCount) productCount.textContent = `Showing ${products.length} products`;
         }
     }
     
     // Fallback: try to initialize immediately if data manager is already loaded
-    if (window.dataManager) {
-        initializeProducts();
-    } else {
-        // Initial render with empty products if data manager not loaded yet
-        renderProducts([]);
-    }
+    // Always try to initialize (backend may be available even if dataManager isn't)
+    initializeProducts();
 });

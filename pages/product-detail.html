@@ -407,6 +407,7 @@
 
     <script src="../scripts/data-manager.js"></script>
     <script src="../scripts/main.js"></script>
+    <script src="../scripts/api.js"></script>
     <script>
     (function(){
         function qs(name){
@@ -470,15 +471,36 @@
             }
         }
 
-        function init(){
+        async function init(){
             const id = qs('id');
-            if (!id || !window.dataManager){ return; }
-            const product = (window.dataManager.getProducts()||[]).find(p=>p.id===id);
+            if (!id){ return; }
+            // Try backend first
+            let product = null;
+            if (window.api && typeof window.api.getJSON === 'function'){
+                try {
+                    const fetched = await window.api.getJSON('/api/products/' + encodeURIComponent(id));
+                    if (fetched && fetched._id){
+                        product = {
+                            id: fetched._id,
+                            name: fetched.name,
+                            price: Number(fetched.price)||0,
+                            category: fetched.category||'',
+                            brand: fetched.brand||'',
+                            image: fetched.image||'../assets/images/placeholder-smartphone.jpg',
+                            description: fetched.description||'',
+                            stock: Number(fetched.stock)||0,
+                            status: fetched.status||'active',
+                        };
+                    }
+                } catch(_) { /* fallback below */ }
+            }
+            if (!product && window.dataManager){
+                product = (window.dataManager.getProducts()||[]).find(p=>p.id===id);
+            }
             renderProduct(product);
         }
 
-        if (window.dataManager) init();
-        else window.addEventListener('load', init);
+        window.addEventListener('load', init);
     })();
     </script>
 </body>

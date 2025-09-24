@@ -442,7 +442,7 @@
         // Submit: create order, save, clear cart, redirect to dashboard
         const form=document.getElementById('checkoutForm');
         if(form){
-            form.addEventListener('submit', function(e){
+            form.addEventListener('submit', async function(e){
                 e.preventDefault();
                 const cart=getCart();
                 if(cart.length===0){
@@ -492,46 +492,75 @@
                     location: isDelivery? { lat: latVal||'', lng: lngVal||'', note: locNote } : null,
                     customer
                 };
-                // Save order using data manager if available
-                if (window.dataManager) {
-                    window.dataManager.addOrder(order);
-                    // Decrement stock for each item
-                    try {
-                        const products = window.dataManager.getProducts();
-                        order.items.forEach(it => {
-                            const p = products.find(pr => pr.id === it.id);
-                            if (p) {
-                                const newStock = Math.max(0, (parseInt(p.stock)||0) - (parseInt(it.qty)||0));
-                                window.dataManager.updateProduct(p.id, { stock: newStock });
+
+                // Try backend first
+                let backendSaved = false;
+                try {
+                    const payload = {
+                        items: order.items.map(it => ({ name: it.name, price: it.price, qty: it.qty, image: it.image })),
+                        total: order.total,
+                        status: 'pending',
+                        customer: {
+                            firstName: order.customer.name?.split(' ')[0] || order.customer.firstName || order.customer.name || '',
+                            lastName: order.customer.name?.split(' ').slice(1).join(' ') || order.customer.lastName || '',
+                            email: order.customer.email,
+                            phone: order.customer.phone,
+                            address: order.location ? (order.location.note || '') : ''
+                        },
+                        notes: `${order.fulfillment}${order.location?` @(${order.location.lat},${order.location.lng})`:''} ${order.paymentMethod==='mpesa' ? `MPesa:${order.mpesaPhone}`:''}`.trim()
+                    };
+                    const resp = await fetch('/api/orders', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (resp.ok) backendSaved = true;
+                } catch (err) {
+                    // ignore and fallback
+                }
+
+                if (!backendSaved) {
+                    // Save order using data manager if available
+                    if (window.dataManager) {
+                        window.dataManager.addOrder(order);
+                        // Decrement stock for each item
+                        try {
+                            const products = window.dataManager.getProducts();
+                            order.items.forEach(it => {
+                                const p = products.find(pr => pr.id === it.id);
+                                if (p) {
+                                    const newStock = Math.max(0, (parseInt(p.stock)||0) - (parseInt(it.qty)||0));
+                                    window.dataManager.updateProduct(p.id, { stock: newStock });
+                                }
+                            });
+                        } catch(e) { /* ignore */ }
+                    } else {
+                        // Fallback to direct localStorage
+                        try{
+                            const raw=localStorage.getItem('orders');
+                            const orders= raw? JSON.parse(raw): [];
+                            if(Array.isArray(orders)){
+                                orders.unshift(order);
+                                localStorage.setItem('orders', JSON.stringify(orders));
+                            }else{
+                                localStorage.setItem('orders', JSON.stringify([order]));
                             }
-                        });
-                    } catch(e) { /* ignore */ }
-                } else {
-                    // Fallback to direct localStorage
-                    try{
-                        const raw=localStorage.getItem('orders');
-                        const orders= raw? JSON.parse(raw): [];
-                        if(Array.isArray(orders)){
-                            orders.unshift(order);
-                            localStorage.setItem('orders', JSON.stringify(orders));
-                        }else{
+                        }catch(err){
                             localStorage.setItem('orders', JSON.stringify([order]));
                         }
-                    }catch(err){
-                        localStorage.setItem('orders', JSON.stringify([order]));
+                        // Fallback stock decrement
+                        try{
+                            const rawp = localStorage.getItem('products');
+                            const prods = rawp? JSON.parse(rawp): [];
+                            if (Array.isArray(prods)){
+                                order.items.forEach(it=>{
+                                    const idx = prods.findIndex(p=>p.id===it.id);
+                                    if (idx>-1){ prods[idx].stock = Math.max(0, (parseInt(prods[idx].stock)||0) - (parseInt(it.qty)||0)); }
+                                });
+                                localStorage.setItem('products', JSON.stringify(prods));
+                            }
+                        }catch(_){/* ignore */}
                     }
-                    // Fallback stock decrement
-                    try{
-                        const rawp = localStorage.getItem('products');
-                        const prods = rawp? JSON.parse(rawp): [];
-                        if (Array.isArray(prods)){
-                            order.items.forEach(it=>{
-                                const idx = prods.findIndex(p=>p.id===it.id);
-                                if (idx>-1){ prods[idx].stock = Math.max(0, (parseInt(prods[idx].stock)||0) - (parseInt(it.qty)||0)); }
-                            });
-                            localStorage.setItem('products', JSON.stringify(prods));
-                        }
-                    }catch(_){/* ignore */}
                 }
                 // Persist current customer identity for dashboard filtering
                 try {

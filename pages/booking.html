@@ -260,7 +260,7 @@
             });
         }
 
-        form.addEventListener('submit', function(e) {
+        form.addEventListener('submit', async function(e) {
             e.preventDefault();
             // Collect values
             const deviceType = document.getElementById('deviceType')?.value || '';
@@ -288,22 +288,37 @@
             const booking = {
                 device: { type: deviceType, brand: deviceBrand, model: deviceModel },
                 issue: { type: issueType, description: issueDescription },
-                service: { urgency: serviceUrgency, location: locationType, pickupAddress, contactMethod },
+                serviceOptions: { urgency: serviceUrgency, location: locationType, pickupAddress, contactMethod },
                 customer
             };
 
-            if (window.dataManager) {
-                window.dataManager.addBooking(booking);
-            } else {
-                // Fallback to localStorage array
-                try {
-                    const raw = localStorage.getItem('bookings');
-                    const items = raw ? JSON.parse(raw) : [];
-                    const newBooking = { id: 'BOOK-' + Date.now(), createdAt: new Date().toISOString(), status: 'pending', ...booking };
-                    items.push(newBooking);
-                    localStorage.setItem('bookings', JSON.stringify(items));
-                } catch(e) {
-                    /* ignore */
+            // Try backend first
+            let backendSaved = false;
+            try {
+                const resp = await fetch('/api/bookings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(booking)
+                });
+                if (resp.ok) backendSaved = true;
+            } catch (err) {
+                // ignore, will fallback
+            }
+
+            if (!backendSaved) {
+                if (window.dataManager) {
+                    window.dataManager.addBooking(booking);
+                } else {
+                    // Fallback to localStorage array
+                    try {
+                        const raw = localStorage.getItem('bookings');
+                        const items = raw ? JSON.parse(raw) : [];
+                        const newBooking = { id: 'BOOK-' + Date.now(), createdAt: new Date().toISOString(), status: 'pending', ...booking };
+                        items.push(newBooking);
+                        localStorage.setItem('bookings', JSON.stringify(items));
+                    } catch(e) {
+                        /* ignore */
+                    }
                 }
             }
 

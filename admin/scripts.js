@@ -46,20 +46,41 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Render customer orders from localStorage into Recent Orders table
-    function renderCustomerOrders() {
+    async function renderCustomerOrders() {
         const tbody = document.querySelector('.data-table tbody');
         if (!tbody) return;
         
         let orders = [];
-        if (window.dataManager) {
-            orders = window.dataManager.getOrders();
-        } else {
-            // Fallback to direct localStorage access
+        // Try backend first (admin view: all orders)
+        if (window.api) {
             try {
-                const raw = localStorage.getItem('orders');
-                const parsed = raw ? JSON.parse(raw) : [];
-                if (Array.isArray(parsed)) orders = parsed;
-            } catch (e) { /* ignore */ }
+                const token = localStorage.getItem('adminToken') || '';
+                const resp = await fetch('/api/orders', { headers: token ? { 'x-admin-token': token } : {} });
+                if (resp.ok) {
+                    const data = await resp.json();
+                    if (Array.isArray(data)) orders = data.map(o => ({
+                        id: o._id || o.id,
+                        customer: { name: (o.customer?.firstName || '') + ' ' + (o.customer?.lastName || ''), email: o.customer?.email, phone: o.customer?.phone },
+                        date: o.createdAt || o.date,
+                        total: o.total,
+                        status: o.status || 'pending',
+                        items: o.items || []
+                    }));
+                }
+            } catch (_) { /* fallback below */ }
+        }
+
+        if (!orders.length) {
+            if (window.dataManager) {
+                orders = window.dataManager.getOrders();
+            } else {
+                // Fallback to direct localStorage access
+                try {
+                    const raw = localStorage.getItem('orders');
+                    const parsed = raw ? JSON.parse(raw) : [];
+                    if (Array.isArray(parsed)) orders = parsed;
+                } catch (e) { /* ignore */ }
+            }
         }
 
         tbody.innerHTML = '';
@@ -390,8 +411,6 @@ function loadProductsSection(contentArea) {
         </div>
     `;
     
-    // Initialize products management
-    initializeProductsManagement();
 }
 
 // Initialize products management functionality
@@ -408,9 +427,30 @@ function initializeProductsManagement() {
     const countBadge = document.getElementById('productsCountBadge');
     
     // Render products
-    function renderProducts() {
+    async function renderProducts() {
         const container = document.getElementById('productsContainer');
-        let products = window.dataManager.getProducts();
+        let products = [];
+        // Backend first
+        if (window.api) {
+            try {
+                const resp = await window.api.getJSON('/api/products');
+                if (Array.isArray(resp)) {
+                    products = resp.map(p => ({
+                        id: p._id || p.id,
+                        name: p.name,
+                        price: Number(p.price)||0,
+                        category: p.category||'',
+                        brand: p.brand||'',
+                        stock: Number(p.stock)||0,
+                        status: p.status||'active',
+                        image: p.image || '../assets/images/placeholder-smartphone.jpg'
+                    }));
+                }
+            } catch (_) { /* fallback below */ }
+        }
+        if (!products.length && window.dataManager) {
+            products = window.dataManager.getProducts();
+        }
 
         // Apply filters
         const q = (searchInput?.value || '').trim().toLowerCase();
@@ -568,10 +608,32 @@ function initializeProductsManagement() {
             image: imageValue
         };
 
-        if (editingProductId) {
-            window.dataManager.updateProduct(editingProductId, productData);
-        } else {
-            window.dataManager.addProduct(productData);
+        const token = localStorage.getItem('adminToken') || '';
+        let savedViaAPI = false;
+        try {
+            if (editingProductId) {
+                const resp = await fetch(`/api/products/${encodeURIComponent(editingProductId)}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', ...(token?{'x-admin-token':token}:{}) },
+                    body: JSON.stringify(productData)
+                });
+                if (resp.ok) savedViaAPI = true;
+            } else {
+                const resp = await fetch('/api/products', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', ...(token?{'x-admin-token':token}:{}) },
+                    body: JSON.stringify(productData)
+                });
+                if (resp.ok) savedViaAPI = true;
+            }
+        } catch (_) { /* fallback below */ }
+
+        if (!savedViaAPI) {
+            if (editingProductId && window.dataManager) {
+                window.dataManager.updateProduct(editingProductId, productData);
+            } else if (window.dataManager) {
+                window.dataManager.addProduct(productData);
+            }
         }
 
         productModal.style.display = 'none';
@@ -606,9 +668,20 @@ function initializeProductsManagement() {
     }
     
     // Delete product
-    function deleteProduct(productId) {
+    async function deleteProduct(productId) {
         if (confirm('Are you sure you want to delete this product?')) {
-            window.dataManager.deleteProduct(productId);
+            const token = localStorage.getItem('adminToken') || '';
+            let deletedViaAPI = false;
+            try {
+                const resp = await fetch(`/api/products/${encodeURIComponent(productId)}`, {
+                    method: 'DELETE',
+                    headers: token? { 'x-admin-token': token } : {}
+                });
+                if (resp.ok) deletedViaAPI = true;
+            } catch (_) { /* fallback below */ }
+            if (!deletedViaAPI && window.dataManager) {
+                window.dataManager.deleteProduct(productId);
+            }
             renderProducts();
         }
     }
@@ -801,12 +874,24 @@ function loadOrdersSection(contentArea) {
     }
 
     // Wire events
-    contentArea.addEventListener('change', function(e){
+    contentArea.addEventListener('change', async function(e){
         const sel = e.target.closest('.order-status-select');
-        if (sel && window.dataManager) {
+        if (sel) {
             const id = sel.getAttribute('data-id');
             const val = sel.value;
-            window.dataManager.updateOrderStatus(id, val);
+            const token = localStorage.getItem('adminToken') || '';
+            let updatedViaAPI = false;
+            try {
+                const resp = await fetch(`/api/orders/${encodeURIComponent(id)}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', ...(token?{'x-admin-token':token}:{}) },
+                    body: JSON.stringify({ status: val })
+                });
+                if (resp.ok) updatedViaAPI = true;
+            } catch (_) { /* fallback below */ }
+            if (!updatedViaAPI && window.dataManager) {
+                window.dataManager.updateOrderStatus(id, val);
+            }
             renderDashboardStats();
         }
     });
