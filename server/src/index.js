@@ -9,6 +9,7 @@ import ordersRouter from './routes/orders.js';
 import bookingsRouter from './routes/bookings.js';
 import customersRouter from './routes/customers.js';
 import healthRouter from './routes/health.js';
+import adminRouter from './routes/admin.js';
 import rateLimit from 'express-rate-limit';
 
 dotenv.config();
@@ -40,6 +41,7 @@ app.use('/api/products', productsRouter);
 app.use('/api/orders', ordersRouter);
 app.use('/api/bookings', bookingsRouter);
 app.use('/api/customers', customersRouter);
+app.use('/api/admin', adminRouter);
 
 // 404 handler
 app.use((req, res) => {

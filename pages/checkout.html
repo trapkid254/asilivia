@@ -519,48 +519,46 @@
                     // ignore and fallback
                 }
 
-                if (!backendSaved) {
-                    // Save order using data manager if available
-                    if (window.dataManager) {
-                        window.dataManager.addOrder(order);
-                        // Decrement stock for each item
-                        try {
-                            const products = window.dataManager.getProducts();
-                            order.items.forEach(it => {
-                                const p = products.find(pr => pr.id === it.id);
-                                if (p) {
-                                    const newStock = Math.max(0, (parseInt(p.stock)||0) - (parseInt(it.qty)||0));
-                                    window.dataManager.updateProduct(p.id, { stock: newStock });
-                                }
-                            });
-                        } catch(e) { /* ignore */ }
-                    } else {
-                        // Fallback to direct localStorage
-                        try{
-                            const raw=localStorage.getItem('orders');
-                            const orders= raw? JSON.parse(raw): [];
-                            if(Array.isArray(orders)){
-                                orders.unshift(order);
-                                localStorage.setItem('orders', JSON.stringify(orders));
-                            }else{
-                                localStorage.setItem('orders', JSON.stringify([order]));
+                // Always save a local copy so guests keep history, regardless of backend result
+                if (window.dataManager) {
+                    window.dataManager.addOrder(order);
+                    // Decrement stock for each item in local cache
+                    try {
+                        const products = window.dataManager.getProducts();
+                        order.items.forEach(it => {
+                            const p = products.find(pr => pr.id === it.id);
+                            if (p) {
+                                const newStock = Math.max(0, (parseInt(p.stock)||0) - (parseInt(it.qty)||0));
+                                window.dataManager.updateProduct(p.id, { stock: newStock });
                             }
-                        }catch(err){
+                        });
+                    } catch(e) { /* ignore */ }
+                } else {
+                    // Direct localStorage persistence
+                    try{
+                        const raw=localStorage.getItem('orders');
+                        const orders= raw? JSON.parse(raw): [];
+                        if(Array.isArray(orders)){
+                            orders.unshift(order);
+                            localStorage.setItem('orders', JSON.stringify(orders));
+                        }else{
                             localStorage.setItem('orders', JSON.stringify([order]));
                         }
-                        // Fallback stock decrement
-                        try{
-                            const rawp = localStorage.getItem('products');
-                            const prods = rawp? JSON.parse(rawp): [];
-                            if (Array.isArray(prods)){
-                                order.items.forEach(it=>{
-                                    const idx = prods.findIndex(p=>p.id===it.id);
-                                    if (idx>-1){ prods[idx].stock = Math.max(0, (parseInt(prods[idx].stock)||0) - (parseInt(it.qty)||0)); }
-                                });
-                                localStorage.setItem('products', JSON.stringify(prods));
-                            }
-                        }catch(_){/* ignore */}
+                    }catch(err){
+                        localStorage.setItem('orders', JSON.stringify([order]));
                     }
+                    // Local stock decrement
+                    try{
+                        const rawp = localStorage.getItem('products');
+                        const prods = rawp? JSON.parse(rawp): [];
+                        if (Array.isArray(prods)){
+                            order.items.forEach(it=>{
+                                const idx = prods.findIndex(p=>p.id===it.id);
+                                if (idx>-1){ prods[idx].stock = Math.max(0, (parseInt(prods[idx].stock)||0) - (parseInt(it.qty)||0)); }
+                            });
+                            localStorage.setItem('products', JSON.stringify(prods));
+                        }
+                    }catch(_){/* ignore */}
                 }
                 // Persist current customer identity for dashboard filtering
                 try {

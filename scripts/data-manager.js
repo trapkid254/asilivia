@@ -8,89 +8,9 @@ class DataManager {
 
     // Initialize default data structure
     initializeData() {
-        // Initialize products if not exists
+        // Initialize products if not exists as empty (admin must add products)
         if (!localStorage.getItem('products')) {
-            const defaultProducts = [
-                {
-                    id: 'prod_1',
-                    name: "Premium Smartphone XYZ",
-                    price: 89999,
-                    category: "mobiles",
-                    brand: "apple",
-                    image: "../assets/images/placeholder-smartphone.jpg",
-                    description: "Latest smartphone with advanced features",
-                    stock: 25,
-                    status: "active",
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString()
-                },
-                {
-                    id: 'prod_2',
-                    name: "Ultrabook Pro 2023",
-                    price: 129999,
-                    category: "laptops",
-                    brand: "dell",
-                    image: "../assets/images/placeholder-laptop.jpg",
-                    description: "High-performance laptop for professionals",
-                    stock: 15,
-                    status: "active",
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString()
-                },
-                {
-                    id: 'prod_3',
-                    name: "Wireless Noise-Cancelling Headphones",
-                    price: 24999,
-                    category: "accessories",
-                    brand: "sony",
-                    image: "../assets/images/placeholder-headphones.jpg",
-                    description: "Premium wireless headphones with noise cancellation",
-                    stock: 40,
-                    status: "active",
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString()
-                },
-                {
-                    id: 'prod_4',
-                    name: "Smart Fitness Tracker",
-                    price: 19999,
-                    category: "accessories",
-                    brand: "samsung",
-                    image: "../assets/images/placeholder-smartwatch.jpg",
-                    description: "Advanced fitness tracking with health monitoring",
-                    stock: 30,
-                    status: "active",
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString()
-                },
-                {
-                    id: 'prod_5',
-                    name: "Gaming Laptop Extreme",
-                    price: 189999,
-                    category: "laptops",
-                    brand: "hp",
-                    image: "../assets/images/placeholder-laptop.jpg",
-                    description: "High-end gaming laptop with RTX graphics",
-                    stock: 8,
-                    status: "active",
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString()
-                },
-                {
-                    id: 'prod_6',
-                    name: "Flagship Smartphone Pro",
-                    price: 109999,
-                    category: "mobiles",
-                    brand: "samsung",
-                    image: "../assets/images/placeholder-smartphone.jpg",
-                    description: "Professional smartphone with advanced camera",
-                    stock: 20,
-                    status: "active",
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString()
-                }
-            ];
-            this.setProducts(defaultProducts);
+            this.setProducts([]);
         }
 
         // Initialize orders if not exists

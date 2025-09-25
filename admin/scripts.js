@@ -1,4 +1,12 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Require admin login: redirect if no token
+    try {
+        const token = localStorage.getItem('adminToken');
+        if (!token) {
+            window.location.href = 'login.html';
+            return;
+        }
+    } catch (_) { /* ignore */ }
     // Load data manager
     const script = document.createElement('script');
     script.src = '../scripts/data-manager.js';
