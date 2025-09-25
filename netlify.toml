@@ -17,9 +17,9 @@
   status = 200
 
 # Optional: uncomment and set your Render backend URL after deploying the backend
-# [[redirects]]
-#   from = "/api/*"
-#   to = "https://<your-render-service>.onrender.com/:splat"
-#   status = 200
-#   force = true
-#   headers = { X-Forwarded-By = "Netlify" }
+[[redirects]]
+  from = "/api/*"
+  to = "https://silvia-backend-jesa.onrender.com/:splat"
+  status = 200
+  force = true
+  headers = { X-Forwarded-By = "Netlify" }
