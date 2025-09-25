@@ -66,6 +66,7 @@
         const data = await resp.json();
         if (data?.token) {
           localStorage.setItem('adminToken', data.token);
+          try { localStorage.setItem('adminUsername', username); } catch(_) {}
           msg.textContent = 'Login successful. Redirecting...';
           msg.classList.add('success');
           setTimeout(()=>{ window.location.href = 'index.html'; }, 600);

@@ -6,6 +6,21 @@ document.addEventListener('DOMContentLoaded', function() {
             window.location.href = 'login.html';
             return;
         }
+        // Display admin username if available
+        const uname = localStorage.getItem('adminUsername') || 'Admin';
+        const prof = document.querySelector('.admin-profile span');
+        if (prof) prof.textContent = uname;
+        // Wire logout
+        const logoutBtn = document.getElementById('adminLogoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function(){
+                try {
+                    localStorage.removeItem('adminToken');
+                    localStorage.removeItem('adminUsername');
+                } catch(_) {}
+                window.location.href = 'login.html';
+            });
+        }
     } catch (_) { /* ignore */ }
     // Load data manager
     const script = document.createElement('script');
