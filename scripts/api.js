@@ -18,7 +18,41 @@
     return base + '/' + String(path).replace(/^\/+/, '');
   }
 
+  // Backend health cache
+  let __backendOk = null; // null=unknown, true/false known
+  let __backendCheckedAt = 0;
+  const HEALTH_TTL_MS = 30000; // 30s cache
+
+  async function checkBackendHealth(force = false) {
+    const now = Date.now();
+    if (!force && __backendOk !== null && (now - __backendCheckedAt) < HEALTH_TTL_MS) {
+      return __backendOk;
+    }
+    __backendCheckedAt = now;
+    try {
+      const controller = new AbortController();
+      const t = setTimeout(() => controller.abort(), 1500);
+      const resp = await fetch(resolvePath('/api/health'), { signal: controller.signal, credentials: 'include' });
+      clearTimeout(t);
+      __backendOk = !!(resp && resp.ok);
+    } catch(_) {
+      __backendOk = false;
+    }
+    return __backendOk;
+  }
+
   async function fetchWithRetry(url, options = {}, retries = 2, timeoutMs = 10000) {
+    // Short-circuit quickly if backend is down (to avoid long spinner)
+    try {
+      const isApiUrl = /^https?:\/\//i.test(url) || String(url).includes('/api/');
+      if (isApiUrl) {
+        const ok = await checkBackendHealth(false);
+        if (!ok) throw new Error('Backend unavailable');
+      }
+    } catch (preErr) {
+      // Fail fast
+      throw preErr;
+    }
     let lastErr;
     for (let attempt = 0; attempt <= retries; attempt++) {
       const controller = new AbortController();
@@ -59,5 +93,6 @@
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     return resp.json();
   }
-  window.api = { getJSON, postJSON, resolvePath, fetchWithRetry };
+  async function isBackendUp(force=false){ return checkBackendHealth(force); }
+  window.api = { getJSON, postJSON, resolvePath, fetchWithRetry, isBackendUp };
 })();
