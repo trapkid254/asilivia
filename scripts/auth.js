@@ -15,7 +15,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Hide all forms
             authForms.forEach(form => form.classList.remove('active'));
-            
             // Show the target form
             document.getElementById(targetTab + 'Form').classList.add('active');
         });
@@ -34,10 +33,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('Please fill in all fields');
                 return;
             }
-            
-            // Simulate login process
-            alert('Login successful! Redirecting to dashboard...');
-            window.location.href = 'dashboard.html';
+            // Persist current customer identity for dashboard filtering
+            try {
+                localStorage.setItem('currentCustomer', JSON.stringify({ email: email.trim() }));
+            } catch(_) {}
+            // Redirect directly to dashboard orders (no popup)
+            window.location.href = 'dashboard.html#orders';
         });
     }
     

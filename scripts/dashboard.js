@@ -2,6 +2,33 @@ document.addEventListener('DOMContentLoaded', function() {
     // Ensure data manager is available (loaded in dashboard.html)
     const hasDM = typeof window.dataManager !== 'undefined';
 
+    // Toast helpers (customer site)
+    function ensureToastContainer(){
+        let c = document.querySelector('.toast-container');
+        if (!c) {
+            c = document.createElement('div');
+            c.className = 'toast-container';
+            document.body.appendChild(c);
+        }
+        return c;
+    }
+    function showToast(message, type='info'){
+        const c = ensureToastContainer();
+        const t = document.createElement('div');
+        t.className = 'toast ' + (type==='success'?'toast-success':type==='error'?'toast-error':'toast-info');
+        t.textContent = message;
+        c.appendChild(t);
+        setTimeout(()=>{ try{ t.remove(); }catch(_){ } }, 5000);
+    }
+
+    // Track last known order statuses to surface changes via toast
+    let lastOrderStatuses = {};
+    try {
+        const rawLOS = localStorage.getItem('lastOrderStatuses');
+        const parsedLOS = rawLOS ? JSON.parse(rawLOS) : {};
+        if (parsedLOS && typeof parsedLOS === 'object') lastOrderStatuses = parsedLOS;
+    } catch(_) { lastOrderStatuses = {}; }
+
     // Dashboard navigation
     const dashboardLinks = document.querySelectorAll('.dashboard-menu a');
     const dashboardSections = document.querySelectorAll('.dashboard-section');
@@ -137,6 +164,21 @@ document.addEventListener('DOMContentLoaded', function() {
             // No identified customer; show none to avoid leaking others' orders
             orders = [];
         }
+        // Detect status changes vs last known
+        try {
+            const currentMap = {};
+            orders.forEach(o => {
+                const id = String(o.id||'');
+                const status = String(o.status||'').toLowerCase();
+                currentMap[id] = status;
+                const prev = lastOrderStatuses[id];
+                if (prev && prev !== status) {
+                    showToast(`Order ${id} status updated to ${o.status}`, 'info');
+                }
+            });
+            lastOrderStatuses = currentMap;
+            localStorage.setItem('lastOrderStatuses', JSON.stringify(lastOrderStatuses));
+        } catch(_) { /* ignore */ }
         // Clear existing rows
         table.innerHTML = '';
         if (!orders.length) {
@@ -388,6 +430,27 @@ document.addEventListener('DOMContentLoaded', function() {
             updateOverview();
         }
     });
+    // Re-fetch when tab becomes visible or window gains focus
+    document.addEventListener('visibilitychange', function(){
+        if (!document.hidden) {
+            renderOrders();
+            renderBookings();
+            renderVouchers();
+            updateOverview();
+        }
+    });
+    window.addEventListener('focus', function(){
+        renderOrders();
+        renderBookings();
+        renderVouchers();
+        updateOverview();
+    });
+    // Lightweight periodic refresh (every 60s)
+    try {
+        setInterval(function(){
+            renderOrders();
+        }, 60000);
+    } catch(_) { /* ignore */ }
     // If URL hash points to a section, open it
     function activateSectionByHash() {
         const hash = window.location.hash.replace('#', '');
