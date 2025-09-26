@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', function() {
             window.location.href = 'login.html';
             return;
         }
+    // Load persisted notifications on start
+    loadNotifications();
         // Display admin username if available
         const uname = localStorage.getItem('adminUsername') || 'Admin';
         const prof = document.querySelector('.admin-profile span');
@@ -50,12 +52,106 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Notification button
+    // Notifications system
     const notificationBtn = document.querySelector('.notification-btn');
-    
+    const notifCountEl = document.querySelector('.notification-count');
+    let notifications = [];
+    let notifPanel = null;
+
+    function ensureNotifPanel() {
+        if (notifPanel) return notifPanel;
+        notifPanel = document.createElement('div');
+        notifPanel.className = 'notification-panel';
+        notifPanel.innerHTML = `
+            <div class="notification-panel-header">
+                <h4>Notifications</h4>
+                <button class="btn btn-secondary btn-sm" id="notifMarkAllRead">Mark all read</button>
+            </div>
+            <div class="notification-list" id="notificationList"></div>
+        `;
+        document.body.appendChild(notifPanel);
+        // Mark all as read
+        notifPanel.querySelector('#notifMarkAllRead')?.addEventListener('click', function(){
+            notifications = notifications.map(n => ({ ...n, read: true }));
+            updateNotificationCount();
+            renderNotifications();
+        });
+        // Outside click closes
+        document.addEventListener('click', function(e){
+            if (!notifPanel) return;
+            if (notifPanel.classList.contains('open')) {
+                const inside = e.target.closest('.notification-panel') || e.target.closest('.notification-btn');
+                if (!inside) notifPanel.classList.remove('open');
+            }
+        });
+        return notifPanel;
+    }
+
+    function updateNotificationCount() {
+        const unread = notifications.filter(n => !n.read).length;
+        if (notifCountEl) notifCountEl.textContent = String(unread);
+    }
+
+    function renderNotifications() {
+        ensureNotifPanel();
+        const list = notifPanel.querySelector('#notificationList');
+        list.innerHTML = '';
+        if (!notifications.length) {
+            const empty = document.createElement('div');
+            empty.className = 'notification-empty';
+            empty.textContent = 'No notifications yet.';
+            list.appendChild(empty);
+            return;
+        }
+        notifications.slice().reverse().forEach(n => {
+            const item = document.createElement('div');
+            item.className = 'notification-item' + (n.read ? ' read' : '');
+            const when = n.at ? new Date(n.at).toLocaleString() : '';
+            item.innerHTML = `
+                <div class="notification-title">${n.title || ''}</div>
+                <div class="notification-desc">${n.desc || ''}</div>
+                <div class="notification-meta">${n.type || ''} • ${when}</div>
+            `;
+            list.appendChild(item);
+        });
+    }
+
+    function saveNotifications() {
+        try { localStorage.setItem('adminNotifications', JSON.stringify(notifications)); } catch(_){}
+    }
+
+    function loadNotifications() {
+        try {
+            const raw = localStorage.getItem('adminNotifications');
+            const parsed = raw ? JSON.parse(raw) : [];
+            if (Array.isArray(parsed)) notifications = parsed; else notifications = [];
+        } catch(_) { notifications = []; }
+        updateNotificationCount();
+        renderNotifications();
+    }
+
+    function pushNotification(n) {
+        notifications.push({ ...n, read: false, at: n.at || new Date().toISOString() });
+        updateNotificationCount();
+        renderNotifications();
+        saveNotifications();
+    }
+
     if (notificationBtn) {
-        notificationBtn.addEventListener('click', function() {
-            alert('Notifications feature will be implemented here');
+        notificationBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            ensureNotifPanel();
+            notifPanel.classList.toggle('open');
+            // Position panel under header-right area
+            const rect = notificationBtn.getBoundingClientRect();
+            notifPanel.style.top = Math.round(rect.bottom + 10) + 'px';
+            notifPanel.style.right = Math.round(window.innerWidth - rect.right) + 'px';
+            // Opening marks notifications as read
+            if (notifPanel.classList.contains('open')) {
+                notifications = notifications.map(n => ({ ...n, read: true }));
+                updateNotificationCount();
+                renderNotifications();
+            }
         });
     }
     
@@ -235,7 +331,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Table row click (delegated event handling)
     document.addEventListener('click', function(e) {
         const row = e.target.closest('.data-table tr');
-        if (row && !e.target.closest('.action-btn') && !row.closest('thead')) {
+        // Ignore clicks that originate from interactive controls like selects/buttons/inputs
+        const onInteractive = !!(e.target.closest('.action-btn') || e.target.closest('select') || e.target.closest('button') || e.target.closest('input') || e.target.closest('textarea'));
+        if (row && !onInteractive && !row.closest('thead')) {
             // Get order ID from the first cell or action button
             const firstCell = row.querySelector('td');
             if (firstCell) {
@@ -275,6 +373,14 @@ function initializeAdmin() {
             if (type === 'orders' || type === 'bookings' || type === 'customers') {
                 renderDashboardStats();
                 renderCustomerOrders();
+                // Push simple notifications for admin
+                if (type === 'orders') {
+                    pushNotification({ type: 'Order', title: 'Order activity', desc: 'Orders have been updated.' });
+                } else if (type === 'bookings') {
+                    pushNotification({ type: 'Booking', title: 'Booking activity', desc: 'Repair bookings have been updated.' });
+                } else if (type === 'customers') {
+                    pushNotification({ type: 'Customer', title: 'Customer activity', desc: 'Customers list has been updated.' });
+                }
             }
         });
     }
@@ -413,57 +519,59 @@ function loadProductsSection(contentArea) {
                     <span class="close" title="Close">&times;</span>
                 </div>
                 <form id="productForm">
-                    <div class="form-group">
-                        <label for="productName">Product Name</label>
-                        <input type="text" id="productName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="productPrice">Price (KSh)</label>
-                        <input type="number" id="productPrice" step="0.01" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="productCategory">Category</label>
-                        <select id="productCategory" required>
-                            <option value="">Select Category</option>
-                            <option value="mobiles">Mobile Phones</option>
-                            <option value="laptops">Laptops</option>
-                            <option value="accessories">Accessories</option>
-                            <option value="tablets">Tablets</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="productBrand">Brand</label>
-                        <select id="productBrand" required>
-                            <option value="">Select Brand</option>
-                            <option value="apple">Apple</option>
-                            <option value="samsung">Samsung</option>
-                            <option value="dell">Dell</option>
-                            <option value="hp">HP</option>
-                            <option value="sony">Sony</option>
-                            <option value="lenovo">Lenovo</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="productStock">Stock Quantity</label>
-                        <input type="number" id="productStock" min="0" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="productDescription">Description</label>
-                        <textarea id="productDescription" rows="3"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="productImage">Image URL</label>
-                        <input type="url" id="productImage" placeholder="https://example.com/image.jpg">
-                    </div>
-                    <div class="form-group">
-                        <label for="productImageFile">Upload Image</label>
-                        <input type="file" id="productImageFile" accept="image/*">
-                        <small>Optional. If you upload a file, it will be used instead of the URL.</small>
-                    </div>
-                    <div class="form-group">
-                        <label>Preview</label>
-                        <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;display:flex;align-items:center;justify-content:center;height:140px;background:#fafafa;">
-                            <img id="productImagePreview" src="../assets/images/placeholder-smartphone.jpg" alt="Preview" style="max-height:100%;max-width:100%;object-fit:contain;">
+                    <div class="form-grid two-col">
+                        <div class="form-group">
+                            <label for="productName">Product Name</label>
+                            <input type="text" id="productName" placeholder="e.g. iPhone 15 Pro" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="productPrice">Price (KSh)</label>
+                            <input type="number" id="productPrice" step="0.01" min="0" placeholder="e.g. 145000" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="productCategory">Category</label>
+                            <select id="productCategory" required>
+                                <option value="">Select Category</option>
+                                <option value="mobiles">Mobile Phones</option>
+                                <option value="laptops">Laptops</option>
+                                <option value="accessories">Accessories</option>
+                                <option value="tablets">Tablets</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="productBrand">Brand</label>
+                            <select id="productBrand" required>
+                                <option value="">Select Brand</option>
+                                <option value="apple">Apple</option>
+                                <option value="samsung">Samsung</option>
+                                <option value="dell">Dell</option>
+                                <option value="hp">HP</option>
+                                <option value="sony">Sony</option>
+                                <option value="lenovo">Lenovo</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="productStock">Stock Quantity</label>
+                            <input type="number" id="productStock" min="0" placeholder="e.g. 25" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="productImage">Image URL</label>
+                            <input type="url" id="productImage" placeholder="https://example.com/image.jpg">
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label for="productImageFile">Upload Image</label>
+                            <input type="file" id="productImageFile" accept="image/*">
+                            <small>Optional. If you upload a file, it will be used instead of the URL.</small>
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label for="productDescription">Description</label>
+                            <textarea id="productDescription" rows="4" placeholder="Short description, specs, key features..."></textarea>
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label>Preview</label>
+                            <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;display:flex;align-items:center;justify-content:center;height:160px;background:#fafafa;">
+                                <img id="productImagePreview" src="../assets/images/placeholder-smartphone.jpg" alt="Preview" style="max-height:100%;max-width:100%;object-fit:contain;">
+                            </div>
                         </div>
                     </div>
                     <div class="form-actions">
@@ -940,7 +1048,7 @@ function loadOrdersSection(contentArea) {
                 <td>KSh ${Number(order.total||0).toFixed(2)}</td>
                 <td>
                     <select class="order-status-select" data-id="${order.id}">
-                        ${['pending','processing','shipped','delivered','cancelled'].map(s => `<option value="${s}" ${String(order.status||'').toLowerCase()===s?'selected':''}>${s.charAt(0).toUpperCase()+s.slice(1)}</option>`).join('')}
+                        ${['pending','processing','paid','shipped','delivered','completed','cancelled','refunded'].map(s => `<option value="${s}" ${String(order.status||'').toLowerCase()===s?'selected':''}>${s.charAt(0).toUpperCase()+s.slice(1)}</option>`).join('')}
                     </select>
                 </td>
                 <td>
@@ -972,6 +1080,12 @@ function loadOrdersSection(contentArea) {
                 window.dataManager.updateOrderStatus(id, val);
             }
             renderDashboardStats();
+        }
+    });
+    // Prevent clicks on the select from bubbling to row/document handlers
+    contentArea.addEventListener('click', function(e){
+        if (e.target.closest('.order-status-select')) {
+            e.stopPropagation();
         }
     });
     document.getElementById('orderSearch')?.addEventListener('input', function(){
@@ -1133,6 +1247,11 @@ function loadBookingsSection(contentArea) {
             const val = sel.value;
             window.dataManager.updateBookingStatus(id, val);
             renderDashboardStats();
+        }
+    });
+    contentArea.addEventListener('click', function(e){
+        if (e.target.closest('.booking-status-select')) {
+            e.stopPropagation();
         }
     });
     document.getElementById('bookingSearch')?.addEventListener('input', function(){

@@ -31,7 +31,13 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!table) return;
         // Fetch orders (backend first)
         let orders = [];
-        // current already loaded above
+        // Load current customer identity
+        let current = null;
+        try {
+            const raw = localStorage.getItem('currentCustomer');
+            const parsed = raw ? JSON.parse(raw) : null;
+            if (parsed && (parsed.email || parsed.phone)) current = parsed;
+        } catch (_) { /* ignore */ }
 
         if (window.api && current) {
             try {
@@ -119,7 +125,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         // Filter to current customer only (by email or phone)
-        // current already loaded above
         if (current) {
             const email = String(current.email || '').trim().toLowerCase();
             const phone = String(current.phone || '').replace(/\s+/g,'');
@@ -329,7 +334,44 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // Populate profile details and greeting from current customer
+    function populateProfileFromCurrent() {
+        let current = null;
+        try {
+            const raw = localStorage.getItem('currentCustomer');
+            const parsed = raw ? JSON.parse(raw) : null;
+            if (parsed && (parsed.email || parsed.phone)) current = parsed;
+        } catch (_) { /* ignore */ }
+        if (!current) return;
+        // Welcome text
+        const welcomeP = document.querySelector('#overview .dashboard-header p');
+        if (welcomeP) {
+            const name = current.firstName && current.lastName
+                ? `${current.firstName} ${current.lastName}`
+                : (current.name || '').trim() || (current.email || current.phone || '');
+            welcomeP.textContent = `Welcome back, ${name}! Here's what's happening with your orders and repair requests.`;
+        }
+        // Profile form fields
+        const fn = document.getElementById('profileFirstName');
+        const ln = document.getElementById('profileLastName');
+        const em = document.getElementById('profileEmail');
+        const ph = document.getElementById('profilePhone');
+        // Derive first/last from name if needed
+        let firstName = current.firstName || '';
+        let lastName = current.lastName || '';
+        if ((!firstName || !lastName) && current.name) {
+            const parts = String(current.name).trim().split(/\s+/);
+            firstName = firstName || (parts[0] || '');
+            lastName = lastName || (parts.slice(1).join(' ') || '');
+        }
+        if (fn && firstName) fn.value = firstName;
+        if (ln && lastName) ln.value = lastName;
+        if (em && current.email) em.value = current.email;
+        if (ph && current.phone) ph.value = current.phone;
+    }
+
     // Initialize
+    populateProfileFromCurrent();
     renderOrders();
     renderBookings();
     renderVouchers();
@@ -339,6 +381,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('dataChanged', function(evt) {
         const t = evt?.detail?.type;
         if (t === 'orders' || t === 'bookings' || t === 'vouchers') {
+            populateProfileFromCurrent();
             renderOrders();
             renderBookings();
             renderVouchers();
