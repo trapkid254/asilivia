@@ -45,8 +45,39 @@
   </div>
   <script src="../scripts/api.js"></script>
   <script>
+    // Allow overriding backend base URL to avoid proxy 504s (saved in localStorage)
+    (function(){
+      try {
+        const saved = localStorage.getItem('backendBaseUrl');
+        if (saved) { window.BACKEND_URL = saved; }
+      } catch(_){}
+    })();
     const form = document.getElementById('adminLoginForm');
     const msg = document.getElementById('msg');
+    // Add a tiny helper to set backend URL
+    const hint = document.createElement('div');
+    hint.className = 'hint';
+    hint.innerHTML = 'Trouble connecting? <a href="#" id="setApiUrl">Set API URL</a>.';
+    form.appendChild(hint);
+    document.getElementById('setApiUrl').addEventListener('click', function(e){
+      e.preventDefault();
+      const current = (typeof window.BACKEND_URL==='string' && window.BACKEND_URL) ? window.BACKEND_URL : '';
+      const v = prompt('Enter backend base URL (e.g., https://your-backend.onrender.com/api). Leave blank to use /api via Netlify proxy.', current || '');
+      if (v === null) return;
+      try {
+        const trimmed = String(v||'').trim();
+        if (trimmed) {
+          localStorage.setItem('backendBaseUrl', trimmed.replace(/\/$/, ''));
+          window.BACKEND_URL = trimmed.replace(/\/$/, '');
+        } else {
+          localStorage.removeItem('backendBaseUrl');
+          delete window.BACKEND_URL;
+        }
+        alert('API base updated. Try logging in again.');
+      } catch(err) {
+        alert('Failed to save setting: '+(err.message||'Unknown error'));
+      }
+    });
     form.addEventListener('submit', async (e)=>{
       e.preventDefault();
       msg.textContent = '';
@@ -54,16 +85,7 @@
       const username = document.getElementById('username').value.trim();
       const password = document.getElementById('password').value.trim();
       try {
-        const resp = await fetch('/api/admin/login', {
-          method:'POST',
-          headers:{ 'Content-Type':'application/json' },
-          body: JSON.stringify({ username, password })
-        });
-        if (!resp.ok) {
-          const txt = await resp.text();
-          throw new Error(txt || ('HTTP '+resp.status));
-        }
-        const data = await resp.json();
+        const data = await window.api.postJSON('admin/login', { username, password });
         if (data?.token) {
           localStorage.setItem('adminToken', data.token);
           try { localStorage.setItem('adminUsername', username); } catch(_) {}
