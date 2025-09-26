@@ -52,6 +52,60 @@ document.addEventListener('DOMContentLoaded', function() {
             } catch (_) { /* fallback below */ }
         }
 
+    // Render vouchers into Vouchers section
+    async function renderVouchers() {
+        const tbody = document.getElementById('vouchersTableBody');
+        if (!tbody) return;
+        // Get current customer identity
+        let current = null;
+        try {
+            const raw = localStorage.getItem('currentCustomer');
+            const parsed = raw ? JSON.parse(raw) : null;
+            if (parsed && (parsed.email || parsed.phone)) current = parsed;
+        } catch (_) { /* ignore */ }
+        let vouchers = [];
+        if (window.api && current) {
+            try {
+                const params = new URLSearchParams();
+                if (current.email) params.set('email', String(current.email).trim());
+                if (current.phone) params.set('phone', String(current.phone).trim());
+                const fetched = await window.api.getJSON('/api/vouchers/by-customer?' + params.toString());
+                if (Array.isArray(fetched)) vouchers = fetched;
+            } catch (_) { /* fallback below */ }
+        }
+        if (!vouchers.length) {
+            // Fallback to local storage vouchers via dataManager
+            try {
+                const all = (window.dataManager?.getVouchers?.() || []);
+                if (current) {
+                    vouchers = all.filter(v => !v.assignedTo || ( (v.assignedTo.email && v.assignedTo.email === current.email) || (v.assignedTo.phone && v.assignedTo.phone === current.phone) ));
+                } else {
+                    vouchers = [];
+                }
+            } catch (_) { vouchers = []; }
+        }
+        tbody.innerHTML = '';
+        if (!vouchers.length) {
+            const tr = document.createElement('tr');
+            const td = document.createElement('td');
+            td.colSpan = 5;
+            td.textContent = 'No vouchers available.';
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+            return;
+        }
+        vouchers.forEach(v => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${v.code}</td>
+                <td>KSh ${Number(v.amount||0).toFixed(2)}</td>
+                <td>${v.used ? 'Used' : 'Active'}</td>
+                <td>${v.assignedTo?.email || v.assignedTo?.phone || ''}</td>
+                <td>${v.usedAt ? new Date(v.usedAt).toLocaleString() : ''}</td>`;
+            tbody.appendChild(tr);
+        });
+    }
+
         if (!orders.length) {
             // Fallbacks
             if (hasDM) {
@@ -278,14 +332,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize
     renderOrders();
     renderBookings();
+    renderVouchers();
     updateOverview();
 
     // Live refresh when data changes
     window.addEventListener('dataChanged', function(evt) {
         const t = evt?.detail?.type;
-        if (t === 'orders' || t === 'bookings') {
+        if (t === 'orders' || t === 'bookings' || t === 'vouchers') {
             renderOrders();
             renderBookings();
+            renderVouchers();
             updateOverview();
         }
     });

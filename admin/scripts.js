@@ -63,8 +63,39 @@ document.addEventListener('DOMContentLoaded', function() {
     const adminProfile = document.querySelector('.admin-profile');
     
     if (adminProfile) {
-        adminProfile.addEventListener('click', function() {
-            alert('Profile dropdown will be implemented here');
+        // Ensure menu exists
+        let menu = document.querySelector('.admin-profile-menu');
+        if (!menu) {
+            menu = document.createElement('div');
+            menu.className = 'admin-profile-menu';
+            menu.innerHTML = `
+                <ul>
+                    <li><button type="button" class="profile-action" data-action="profile">Profile</button></li>
+                    <li><button type="button" class="profile-action" data-action="settings">Settings</button></li>
+                    <li><button type="button" class="profile-action" data-action="logout">Logout</button></li>
+                </ul>
+            `;
+            adminProfile.parentElement?.appendChild(menu);
+        }
+        adminProfile.addEventListener('click', function(e) {
+            e.stopPropagation();
+            menu.classList.toggle('open');
+        });
+        // Outside click closes
+        document.addEventListener('click', function(){ menu.classList.remove('open'); });
+        // Handle actions
+        menu.addEventListener('click', function(e){
+            const btn = e.target.closest('.profile-action');
+            if (!btn) return;
+            const act = btn.getAttribute('data-action');
+            if (act === 'logout') {
+                document.getElementById('adminLogoutBtn')?.click();
+            } else if (act === 'settings') {
+                loadAdminSection('settings');
+            } else if (act === 'profile') {
+                alert('Profile page will be available soon.');
+            }
+            menu.classList.remove('open');
         });
     }
     
@@ -303,6 +334,10 @@ function initializeSidebarNavigation() {
                 section = 'customers';
             } else if (icon.classList.contains('fa-tools')) {
                 section = 'services';
+            } else if (icon.classList.contains('fa-tags')) {
+                section = 'discounts';
+            } else if (icon.classList.contains('fa-cog')) {
+                section = 'settings';
             }
             
             // Load the appropriate section
@@ -335,6 +370,12 @@ function loadAdminSection(section) {
             break;
         case 'services':
             loadServicesSection(contentArea);
+            break;
+        case 'discounts':
+            loadDiscountsSection(contentArea);
+            break;
+        case 'settings':
+            loadSettingsSection(contentArea);
             break;
         default:
             loadDashboardSection(contentArea);
@@ -433,7 +474,8 @@ function loadProductsSection(contentArea) {
             </div>
         </div>
     `;
-    
+    // Initialize product management behaviors after rendering
+    initializeProductsManagement();
 }
 
 // Initialize products management functionality
@@ -853,6 +895,18 @@ function loadOrdersSection(contentArea) {
                 </thead>
                 <tbody></tbody>
             </table>
+        </div>
+        <!-- Order Details Modal -->
+        <div id="orderModal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="orderModalTitle">Order Details</h3>
+                    <span class="close" id="orderModalClose" title="Close">&times;</span>
+                </div>
+                <div class="modal-body" id="orderModalBody" style="max-height:60vh;overflow:auto;">
+                    Loading...
+                </div>
+            </div>
         </div>`;
 
     function renderOrdersTable() {
@@ -891,6 +945,8 @@ function loadOrdersSection(contentArea) {
                 </td>
                 <td>
                     <button class="action-btn view" data-id="${order.id}" title="View"><i class="fas fa-eye"></i></button>
+                    <button class="action-btn edit" data-act="cancel" data-id="${order.id}" title="Cancel"><i class="fas fa-ban"></i></button>
+                    <button class="action-btn edit" data-act="refund" data-id="${order.id}" title="Refund"><i class="fas fa-rotate-left"></i></button>
                 </td>`;
             tbody.appendChild(tr);
         });
@@ -921,6 +977,75 @@ function loadOrdersSection(contentArea) {
     document.getElementById('orderSearch')?.addEventListener('input', function(){
         renderOrdersTable();
     });
+    // View order details with audit
+    contentArea.addEventListener('click', async function(e){
+        const btn = e.target.closest('.action-btn.view');
+        if (!btn) return;
+        const id = btn.getAttribute('data-id');
+        if (!id) return;
+        const modal = document.getElementById('orderModal');
+        const body = document.getElementById('orderModalBody');
+        const title = document.getElementById('orderModalTitle');
+        const close = document.getElementById('orderModalClose');
+        const token = localStorage.getItem('adminToken') || '';
+        let order = null;
+        try {
+            const resp = await fetch('/api/orders/'+encodeURIComponent(id), { headers: token? { 'x-admin-token': token } : {} });
+            if (resp.ok) order = await resp.json();
+        } catch(_){}
+        if (!order && window.dataManager) {
+            try {
+                const list = window.dataManager.getOrders();
+                order = list.find(o=> String(o.id)===String(id));
+            } catch(_){}
+        }
+        if (!order) { alert('Order not found'); return; }
+        title.textContent = `Order ${order._id || order.id || ''}`;
+        const itemsHTML = Array.isArray(order.items) && order.items.length
+            ? `<ul>${order.items.map(i=>`<li>${i.name||''} x${i.qty||1} - KSh ${(Number(i.price||0)*Number(i.qty||1)).toFixed(2)}</li>`).join('')}</ul>`
+            : '<em>No items</em>';
+        const audit = Array.isArray(order.audit) ? order.audit : [];
+        const auditHTML = audit.length ? (`
+            <h4 style="margin-top:12px;">Audit Trail</h4>
+            <ul>${audit.map(a=>`<li><strong>${a.action}</strong> - ${a.note||''} <small>(${a.at? new Date(a.at).toLocaleString():''})</small></li>`).join('')}</ul>
+        `) : '<em>No audit entries</em>';
+        body.innerHTML = `
+            <p><strong>Status:</strong> ${order.status || ''}</p>
+            <p><strong>Total:</strong> KSh ${Number(order.total||0).toFixed(2)}</p>
+            <p><strong>Customer:</strong> ${(order.customer?.firstName||order.customer?.name||'') + ' ' + (order.customer?.lastName||'')}</p>
+            <p><strong>Contact:</strong> ${order.customer?.email||''} ${order.customer?.phone? ' | '+order.customer.phone:''}</p>
+            <h4>Items</h4>
+            ${itemsHTML}
+            ${auditHTML}
+        `;
+        modal.style.display = 'block';
+        close?.addEventListener('click', ()=> modal.style.display='none', { once: true });
+        modal.addEventListener('click', (ev)=>{ if (ev.target===modal) modal.style.display='none'; }, { once: true });
+    });
+    // Cancel / Refund actions
+    contentArea.addEventListener('click', async function(e){
+        const btn = e.target.closest('.action-btn.edit');
+        if (!btn) return;
+        const id = btn.getAttribute('data-id');
+        const act = btn.getAttribute('data-act');
+        if (!id || !act) return;
+        const note = prompt(`Enter a note for ${act} (optional):`) || '';
+        const token = localStorage.getItem('adminToken') || '';
+        try {
+            const resp = await fetch(`/api/orders/${encodeURIComponent(id)}/${act}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', ...(token?{'x-admin-token':token}:{}) },
+                body: JSON.stringify({ note })
+            });
+            if (!resp.ok) throw new Error('HTTP '+resp.status);
+            await resp.json();
+            renderOrdersTable();
+            renderDashboardStats();
+        } catch (_) {
+            alert('Action not completed; ensure backend is running.');
+        }
+    });
+
     window.addEventListener('dataChanged', function(evt){
         if (evt?.detail?.type === 'orders') {
             renderOrdersTable();
@@ -1024,9 +1149,281 @@ function loadBookingsSection(contentArea) {
 }
 
 function loadCustomersSection(contentArea) {
-    contentArea.innerHTML = '<h2>Customers Management - Coming Soon</h2>';
+    contentArea.innerHTML = `
+        <div class="section-header">
+            <h2>Customers Management</h2>
+            <div>
+                <input type="text" id="customerSearch" placeholder="Search name, email, phone" style="padding:8px;border:1px solid #d1d5db;border-radius:4px;width:280px;">
+                <button class="btn btn-primary" id="createVoucherBtn"><i class="fas fa-ticket"></i> Create Voucher</button>
+            </div>
+        </div>
+        <div class="table-container">
+            <table class="data-table" id="customersTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Vouchers</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    `;
+
+    function renderCustomers() {
+        if (!window.dataManager) return;
+        const tbody = document.querySelector('#customersTable tbody');
+        const q = (document.getElementById('customerSearch')?.value || '').trim().toLowerCase();
+        const customers = window.dataManager.getCustomers()
+            .filter(c => !q ||
+                String(c.firstName||'').toLowerCase().includes(q) ||
+                String(c.lastName||'').toLowerCase().includes(q) ||
+                String(c.email||'').toLowerCase().includes(q) ||
+                String(c.phone||'').toLowerCase().includes(q)
+            )
+            .slice().reverse();
+        tbody.innerHTML = '';
+        if (!customers.length) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td colspan="5">No customers found</td>`;
+            tbody.appendChild(tr);
+            return;
+        }
+        customers.forEach(c => {
+            const vouchers = (window.dataManager.getVouchersForCustomer?.(c) || []).filter(v => !v.used);
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${(c.firstName||'') + ' ' + (c.lastName||'')}</td>
+                <td>${c.email||''}</td>
+                <td>${c.phone||''}</td>
+                <td>${vouchers.map(v=>`${v.code} (KSh ${Number(v.amount||0).toFixed(2)})`).join(', ') || 'None'}</td>
+                <td>
+                    <button class="btn btn-sm btn-primary assign-voucher" data-email="${c.email||''}" data-phone="${c.phone||''}"><i class="fas fa-plus"></i> Assign Voucher</button>
+                </td>`;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // Events
+    document.getElementById('customerSearch')?.addEventListener('input', renderCustomers);
+    document.getElementById('createVoucherBtn')?.addEventListener('click', async function(){
+        const code = prompt('Enter voucher code (e.g., SAVE200):');
+        if (!code) return;
+        const amount = parseFloat(prompt('Enter voucher amount (KSh):')||'0');
+        if (isNaN(amount) || amount <= 0) return alert('Invalid amount');
+        // Try backend first
+        const token = localStorage.getItem('adminToken') || '';
+        let ok = false;
+        try {
+            const resp = await fetch('/api/vouchers', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', ...(token?{'x-admin-token':token}:{}) },
+                body: JSON.stringify({ code, amount })
+            });
+            ok = resp.ok;
+        } catch (_) { /* ignore */ }
+        if (!ok && window.dataManager?.createVoucher) {
+            window.dataManager.createVoucher({ code, amount });
+        }
+        alert('Voucher created. Assign it to a customer.');
+    });
+    contentArea.addEventListener('click', function(e){
+        const btn = e.target.closest('.assign-voucher');
+        if (!btn) return;
+        const email = btn.getAttribute('data-email')||'';
+        const phone = btn.getAttribute('data-phone')||'';
+        const code = prompt('Enter existing voucher code to assign:');
+        if (!code) return;
+        if (window.dataManager?.assignVoucherToCustomer) {
+            window.dataManager.assignVoucherToCustomer({ email, phone }, code);
+            alert('Voucher assigned');
+            renderCustomers();
+        }
+    });
+    window.addEventListener('dataChanged', function(evt){
+        if (['customers','vouchers'].includes(evt?.detail?.type)) renderCustomers();
+    });
+    renderCustomers();
 }
 
-function loadServicesSection(contentArea) {
-    contentArea.innerHTML = '<h2>Services Management - Coming Soon</h2>';
+// Discounts / Vouchers management
+function loadDiscountsSection(contentArea) {
+    contentArea.innerHTML = `
+        <div class="section-header">
+            <h2>Discounts & Vouchers</h2>
+            <div>
+                <select id="voucherStatusFilter" style="padding:8px;border:1px solid #d1d5db;border-radius:4px;">
+                    <option value="all">All</option>
+                    <option value="active">Active</option>
+                    <option value="used">Used</option>
+                </select>
+                <select id="voucherAssignFilter" style="padding:8px;border:1px solid #d1d5db;border-radius:4px;">
+                    <option value="all">All</option>
+                    <option value="assigned">Assigned</option>
+                    <option value="unassigned">Unassigned</option>
+                </select>
+                <button class="btn btn-primary" id="newVoucherBtn"><i class="fas fa-ticket"></i> New Voucher</button>
+            </div>
+        </div>
+        <div class="table-container">
+            <table class="data-table" id="vouchersTable">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Amount</th>
+                        <th>Assigned To</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>`;
+
+    async function fetchVouchersList() {
+        const token = localStorage.getItem('adminToken') || '';
+        try {
+            const resp = await fetch('/api/vouchers', { headers: token? { 'x-admin-token': token } : {} });
+            if (resp.ok) {
+                const data = await resp.json();
+                if (Array.isArray(data)) return data;
+            }
+        } catch (_) { /* fallback */ }
+        return (window.dataManager?.getVouchers?.() || []).slice();
+    }
+
+    async function renderVouchers() {
+        const tbody = document.querySelector('#vouchersTable tbody');
+        let list = (await fetchVouchersList()).slice().reverse();
+        const statusF = document.getElementById('voucherStatusFilter')?.value || 'all';
+        const assignF = document.getElementById('voucherAssignFilter')?.value || 'all';
+        list = list.filter(v => {
+            const isUsed = !!v.used;
+            const isAssigned = !!(v.assignedTo && (v.assignedTo.email || v.assignedTo.phone));
+            const statusOk = (statusF==='all') || (statusF==='active' && !isUsed) || (statusF==='used' && isUsed);
+            const assignOk = (assignF==='all') || (assignF==='assigned' && isAssigned) || (assignF==='unassigned' && !isAssigned);
+            return statusOk && assignOk;
+        });
+        tbody.innerHTML = '';
+        if (!list.length) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td colspan="5">No vouchers yet</td>`;
+            tbody.appendChild(tr);
+            return;
+        }
+        list.forEach(v => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${v.code}</td>
+                <td>KSh ${Number(v.amount||0).toFixed(2)}</td>
+                <td>${v.assignedTo?.email || v.assignedTo?.phone || 'Unassigned'}</td>
+                <td>${v.used ? 'Used' : 'Active'}</td>
+                <td>
+                    ${v.used ? '' : '<button class="btn btn-sm btn-secondary" data-act="assign" data-code="'+v.code+'">Assign</button>'}
+                    <button class="btn btn-sm btn-danger" data-act="delete" data-code="${v.code}">Delete</button>
+                </td>`;
+            tbody.appendChild(tr);
+        });
+    }
+
+    document.getElementById('newVoucherBtn')?.addEventListener('click', async function(){
+        const code = prompt('Enter voucher code:');
+        if (!code) return;
+        const amount = parseFloat(prompt('Amount (KSh):')||'0');
+        if (!amount || amount <= 0) return alert('Invalid amount');
+        const token = localStorage.getItem('adminToken') || '';
+        let ok = false;
+        try {
+            const resp = await fetch('/api/vouchers', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', ...(token?{'x-admin-token':token}:{}) },
+                body: JSON.stringify({ code, amount })
+            });
+            ok = resp.ok;
+        } catch(_){}
+        if (!ok) {
+            window.dataManager?.createVoucher?.({ code, amount });
+        }
+        renderVouchers();
+    });
+
+    contentArea.addEventListener('click', async function(e){
+        const btn = e.target.closest('button[data-act]');
+        if (!btn) return;
+        const act = btn.getAttribute('data-act');
+        const code = btn.getAttribute('data-code');
+        if (act === 'assign') {
+            const ident = prompt('Assign to customer email or phone:');
+            if (!ident) return;
+            const token = localStorage.getItem('adminToken') || '';
+            let ok = false;
+            try {
+                const resp = await fetch('/api/vouchers/assign', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', ...(token?{'x-admin-token':token}:{}) },
+                    body: JSON.stringify({ code, email: /@/.test(ident)? ident:'', phone: /@/.test(ident)? '': ident })
+                });
+                ok = resp.ok;
+            } catch(_){}
+            if (!ok) {
+                window.dataManager?.assignVoucherToIdent?.(ident, code);
+            }
+            renderVouchers();
+        } else if (act === 'delete') {
+            if (confirm('Delete voucher '+code+'?')) {
+                const token = localStorage.getItem('adminToken') || '';
+                let ok = false;
+                try {
+                    const resp = await fetch('/api/vouchers/'+encodeURIComponent(code), {
+                        method: 'DELETE',
+                        headers: token? { 'x-admin-token': token } : {}
+                    });
+                    ok = resp.ok;
+                } catch(_){}
+                if (!ok) {
+                    window.dataManager?.deleteVoucher?.(code);
+                }
+                renderVouchers();
+            }
+        }
+    });
+
+    document.getElementById('voucherStatusFilter')?.addEventListener('change', renderVouchers);
+    document.getElementById('voucherAssignFilter')?.addEventListener('change', renderVouchers);
+    window.addEventListener('dataChanged', function(evt){
+        if (evt?.detail?.type === 'vouchers') renderVouchers();
+    });
+    renderVouchers();
 }
+
+function loadSettingsSection(contentArea) {
+    const currentTheme = (localStorage.getItem('adminTheme')||'light');
+    contentArea.innerHTML = `
+        <div class="section-header"><h2>Settings</h2></div>
+        <div class="content-section">
+            <div class="form-group">
+                <label for="themeToggle">Theme</label>
+                <select id="themeToggle">
+                    <option value="light" ${currentTheme==='light'?'selected':''}>Light</option>
+                    <option value="dark" ${currentTheme==='dark'?'selected':''}>Dark</option>
+                </select>
+            </div>
+        </div>`;
+    const sel = document.getElementById('themeToggle');
+    sel?.addEventListener('change', function(){
+        const val = sel.value === 'dark' ? 'dark' : 'light';
+        localStorage.setItem('adminTheme', val);
+        applyAdminTheme();
+    });
+}
+
+function applyAdminTheme() {
+    const val = (localStorage.getItem('adminTheme')||'light');
+    document.body.classList.toggle('theme-dark', val === 'dark');
+}
+
+// Apply theme immediately on load
+applyAdminTheme();

@@ -10,6 +10,36 @@
     --header-height: 70px;
 }
 
+/* Dark theme */
+body.theme-dark {
+    --primary: #60a5fa;
+    --secondary: #3b82f6;
+    --accent: #34d399;
+    --dark: #f3f4f6;
+    --light: #111827;
+    --gray: #9ca3af;
+    background-color: #0f172a;
+    color: #e5e7eb;
+}
+body.theme-dark .admin-sidebar { background-color: #0b1220; color: #e5e7eb; }
+body.theme-dark .sidebar-nav a { color: #cbd5e1; }
+body.theme-dark .sidebar-nav a:hover { background-color: rgba(255,255,255,0.06); color: #fff; }
+body.theme-dark .admin-header { background-color: #0b1220; box-shadow: 0 2px 10px rgba(0,0,0,0.4); }
+body.theme-dark .search-box input { background: #0f172a; border-color: #1f2937; color: #e5e7eb; }
+body.theme-dark .content-section { background-color: #0b1220; box-shadow: 0 4px 6px rgba(0,0,0,0.4); }
+body.theme-dark .data-table th { background-color: #0f172a; }
+body.theme-dark .data-table td { border-bottom-color: #1f2937; }
+body.theme-dark .product-card { background: #0b1220; border-color: #1f2937; box-shadow: 0 2px 8px rgba(0,0,0,0.35); }
+body.theme-dark .admin-profile-menu { background: #0b1220; border-color: #1f2937; }
+body.theme-dark .admin-profile-menu .profile-action:hover { background: #0f172a; }
+body.theme-dark input[type="text"],
+body.theme-dark input[type="number"],
+body.theme-dark input[type="email"],
+body.theme-dark input[type="url"],
+body.theme-dark select,
+body.theme-dark textarea { background: #0f172a; border-color: #1f2937; color: #e5e7eb; }
+body.theme-dark .data-table tr:hover { background-color: #0f172a; }
+
 * {
     margin: 0;
     padding: 0;
@@ -186,6 +216,33 @@ body {
     padding: 25px;
     overflow-y: auto;
 }
+
+/* Profile dropdown */
+.admin-profile-menu {
+    position: absolute;
+    right: 25px;
+    top: calc(var(--header-height) - 10px);
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    min-width: 180px;
+    display: none;
+    z-index: 1000;
+}
+.admin-profile-menu.open { display: block; }
+.admin-profile-menu ul { list-style: none; padding: 8px; }
+.admin-profile-menu li { margin: 4px 0; }
+.admin-profile-menu .profile-action {
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    padding: 8px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.admin-profile-menu .profile-action:hover { background: #f3f4f6; }
 
 .product-info h4 {
     font-size: 1.1rem;

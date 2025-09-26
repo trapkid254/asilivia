@@ -11,7 +11,7 @@ const OrderItemSchema = new mongoose.Schema({
 const OrderSchema = new mongoose.Schema({
   items: { type: [OrderItemSchema], default: [] },
   total: { type: Number, default: 0 },
-  status: { type: String, enum: ['pending', 'paid', 'shipped', 'completed', 'cancelled'], default: 'pending' },
+  status: { type: String, enum: ['pending', 'processing', 'paid', 'shipped', 'delivered', 'completed', 'cancelled', 'refunded'], default: 'pending' },
   customer: {
     firstName: String,
     lastName: String,
@@ -20,6 +20,7 @@ const OrderSchema = new mongoose.Schema({
     address: String,
   },
   notes: String,
+  audit: { type: [{ action: String, note: String, at: Date }], default: [] },
 }, { timestamps: true });
 
 export default mongoose.model('Order', OrderSchema);

@@ -286,6 +286,7 @@
         const mpesaField = document.querySelector('.mpesa-field');
         const mpesaPhone = document.getElementById('mpesaPhone');
         const placeOrderBtn = document.querySelector('#checkoutForm .btn.btn-accent');
+        let appliedVoucher = null; // { code, amount }
         const fullNameInput = document.getElementById('fullName');
         const emailInput = document.getElementById('email');
         const phoneInput = document.getElementById('phone');
@@ -319,6 +320,22 @@
             return 1000;                     // remote/far
         }
 
+        // Helpers to fetch vouchers for an identifier
+        function _getAllVouchers(){
+            try{ const raw=localStorage.getItem('vouchers'); const v= raw? JSON.parse(raw): []; return Array.isArray(v)? v: []; }catch(_){ return []; }
+        }
+        function getVouchersForIdent(email, phone){
+            const list = (window.dataManager?.getVouchers?.() || _getAllVouchers());
+            const e = String(email||'');
+            const p = String(phone||'');
+            return list.filter(v => !v.used && v.assignedTo && ((v.assignedTo.email && v.assignedTo.email === e) || (v.assignedTo.phone && v.assignedTo.phone === p)));
+        }
+        function pickBestVoucher(email, phone){
+            const vs = getVouchersForIdent(email, phone);
+            if (!vs.length) return null;
+            return vs.slice().sort((a,b)=>Number(b.amount||0)-Number(a.amount||0))[0];
+        }
+
         // ===== Render Order Summary from cart =====
         function renderSummary(){
             const itemsWrap=document.querySelector('.summary-items');
@@ -345,7 +362,10 @@
                     <div class="item-price">KSh ${price.toFixed(2)}</div>`;
                 itemsWrap.appendChild(row);
             });
-            const discount=0; // can plug a code later
+            // compute applicable discount from voucher if any
+            const bestVoucher = appliedVoucher || pickBestVoucher(emailInput?.value, phoneInput?.value);
+            appliedVoucher = bestVoucher || null;
+            let discount = bestVoucher ? Math.min(Number(bestVoucher.amount||0), subtotal) : 0;
             const isDelivery = document.querySelector('input[name="fulfillment"][value="delivery"]')?.checked;
             const latVal = document.getElementById('lat')?.value;
             const lngVal = document.getElementById('lng')?.value;
@@ -362,7 +382,7 @@
                     <span>${isDelivery ? ('KSh ' + deliveryFee.toFixed(2)) : 'KSh 0.00'}</span>
                 </div>
                 <div class="summary-row discount">
-                    <span>Discount</span>
+                    <span>Discount${appliedVoucher?` (${appliedVoucher.code})`:''}</span>
                     <span>${discount>0?('-KSh '+discount.toFixed(2)):'KSh 0.00'}</span>
                 </div>
                 <div class="summary-row total">
@@ -437,6 +457,9 @@
         }
         if (mpesaRadio) mpesaRadio.addEventListener('change', applyPayment);
         if (cashRadio) cashRadio.addEventListener('change', applyPayment);
+        // Re-evaluate vouchers when identity fields change
+        if (emailInput) emailInput.addEventListener('input', ()=>{ appliedVoucher=null; renderSummary(); });
+        if (phoneInput) phoneInput.addEventListener('input', ()=>{ appliedVoucher=null; renderSummary(); });
         if (mpesaRadio) mpesaRadio.addEventListener('change', ()=>{ if(placeOrderBtn) placeOrderBtn.disabled=false; });
 
         // Submit: create order, save, clear cart, redirect to dashboard
@@ -477,7 +500,8 @@
                     return { id: it.id, name: it.name, price, qty, image: it.image };
                 });
                 const deliveryFee = computeDeliveryFeeByDistance(latVal, lngVal, !!isDelivery);
-                const discount = 0;
+                const bestVoucher = appliedVoucher || pickBestVoucher(customer.email, customer.phone);
+                const discount = bestVoucher ? Math.min(Number(bestVoucher.amount||0), subtotal) : 0;
                 const total = subtotal + (isDelivery?deliveryFee:0) - discount;
                 const orderId = 'ORD-' + Date.now();
                 const order = {
@@ -522,6 +546,23 @@
                 // Always save a local copy so guests keep history, regardless of backend result
                 if (window.dataManager) {
                     window.dataManager.addOrder(order);
+                    // Redeem voucher if applied
+                    try{
+                        if (bestVoucher) {
+                            const identEmail = customer.email || '';
+                            const identPhone = customer.phone || '';
+                            // Try backend redemption first
+                            try {
+                                await fetch('/api/vouchers/redeem', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ code: bestVoucher.code, email: identEmail, phone: identPhone })
+                                });
+                            } catch(_){ /* ignore and fallback */ }
+                            // Local fallback
+                            try { window.dataManager.redeemVoucherForIdent(identEmail || identPhone, bestVoucher.code); } catch(_){/* ignore */}
+                        }
+                    } catch(_){/* ignore */}
                     // Decrement stock for each item in local cache
                     try {
                         const products = window.dataManager.getProducts();

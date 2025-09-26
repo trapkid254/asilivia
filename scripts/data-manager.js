@@ -27,6 +27,11 @@ class DataManager {
         if (!localStorage.getItem('customers')) {
             this.setCustomers([]);
         }
+
+        // Initialize vouchers if not exists
+        if (!localStorage.getItem('vouchers')) {
+            this.setVouchers([]);
+        }
     }
 
     // Product Management
@@ -235,6 +240,66 @@ class DataManager {
         }
         
         this.setCustomers(customers);
+    }
+
+    // Vouchers/Discounts Management
+    getVouchers() {
+        try {
+            const v = localStorage.getItem('vouchers');
+            return v ? JSON.parse(v) : [];
+        } catch (e) { return []; }
+    }
+    setVouchers(vouchers) {
+        try {
+            localStorage.setItem('vouchers', JSON.stringify(vouchers));
+            this.notifyDataChange('vouchers', vouchers);
+        } catch (e) { /* ignore */ }
+    }
+    createVoucher({ code, amount }) {
+        const list = this.getVouchers();
+        const exists = list.some(v => String(v.code).toLowerCase() === String(code).toLowerCase());
+        if (exists) return null;
+        const item = { code: String(code).trim(), amount: Number(amount)||0, used: false, assignedTo: null, createdAt: new Date().toISOString() };
+        list.push(item);
+        this.setVouchers(list);
+        return item;
+    }
+    deleteVoucher(code) {
+        const list = this.getVouchers().filter(v => String(v.code) !== String(code));
+        this.setVouchers(list);
+        return true;
+    }
+    assignVoucherToCustomer(customer, code) {
+        if (!customer) return null;
+        const ident = customer.email || customer.phone;
+        return this.assignVoucherToIdent(ident, code);
+    }
+    assignVoucherToIdent(identifier, code) {
+        const list = this.getVouchers();
+        const i = list.findIndex(v => String(v.code) === String(code));
+        if (i === -1) return null;
+        list[i].assignedTo = { email: /@/.test(String(identifier)) ? String(identifier) : '', phone: /@/.test(String(identifier)) ? '' : String(identifier) };
+        this.setVouchers(list);
+        return list[i];
+    }
+    getVouchersForCustomer(customer) {
+        if (!customer) return [];
+        const identEmail = customer.email || '';
+        const identPhone = customer.phone || '';
+        return this.getVouchers().filter(v => (v.assignedTo?.email && v.assignedTo.email === identEmail) || (v.assignedTo?.phone && v.assignedTo.phone === identPhone));
+    }
+    redeemVoucherForIdent(identifier, code) {
+        const list = this.getVouchers();
+        const idx = list.findIndex(v => String(v.code) === String(code));
+        if (idx === -1) return null;
+        if (list[idx].assignedTo && ((list[idx].assignedTo.email && list[idx].assignedTo.email !== identifier) && (list[idx].assignedTo.phone && list[idx].assignedTo.phone !== identifier))) {
+            // prevent redeeming by a different identifier
+            return null;
+        }
+        list[idx].used = true;
+        list[idx].usedAt = new Date().toISOString();
+        this.setVouchers(list);
+        return list[idx];
     }
 
     // Statistics and Analytics

@@ -8,6 +8,7 @@ import productsRouter from './routes/products.js';
 import ordersRouter from './routes/orders.js';
 import bookingsRouter from './routes/bookings.js';
 import customersRouter from './routes/customers.js';
+import vouchersRouter from './routes/vouchers.js';
 import healthRouter from './routes/health.js';
 import adminRouter from './routes/admin.js';
 import rateLimit from 'express-rate-limit';
@@ -41,6 +42,7 @@ app.use('/api/products', productsRouter);
 app.use('/api/orders', ordersRouter);
 app.use('/api/bookings', bookingsRouter);
 app.use('/api/customers', customersRouter);
+app.use('/api/vouchers', vouchersRouter);
 app.use('/api/admin', adminRouter);
 
 // 404 handler

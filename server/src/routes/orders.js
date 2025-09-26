@@ -49,9 +49,19 @@ router.post('/', async (req, res, next) => {
 // Update order status/details
 router.put('/:id', adminAuth, async (req, res, next) => {
   try {
-    const updated = await Order.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!updated) return res.status(404).json({ error: 'Order not found' });
-    res.json(updated);
+    const id = req.params.id;
+    const updates = req.body || {};
+    const order = await Order.findById(id);
+    if (!order) return res.status(404).json({ error: 'Order not found' });
+    // Track status change
+    const audit = order.audit || [];
+    if (typeof updates.status !== 'undefined' && updates.status !== order.status) {
+      audit.push({ action: 'status_change', note: `Status ${order.status} -> ${updates.status}`, at: new Date() });
+    }
+    // Merge updates
+    Object.assign(order, updates, { audit });
+    await order.save();
+    res.json(order);
   } catch (err) { next(err); }
 });
 
@@ -61,6 +71,36 @@ router.delete('/:id', adminAuth, async (req, res, next) => {
     const deleted = await Order.findByIdAndDelete(req.params.id);
     if (!deleted) return res.status(404).json({ error: 'Order not found' });
     res.json({ success: true });
+  } catch (err) { next(err); }
+});
+
+// Cancel order with note
+router.post('/:id/cancel', adminAuth, async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const note = String(req.body?.note || '').trim();
+    const order = await Order.findById(id);
+    if (!order) return res.status(404).json({ error: 'Order not found' });
+    order.audit = order.audit || [];
+    order.audit.push({ action: 'cancel', note, at: new Date() });
+    order.status = 'cancelled';
+    await order.save();
+    res.json(order);
+  } catch (err) { next(err); }
+});
+
+// Refund order with note
+router.post('/:id/refund', adminAuth, async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const note = String(req.body?.note || '').trim();
+    const order = await Order.findById(id);
+    if (!order) return res.status(404).json({ error: 'Order not found' });
+    order.audit = order.audit || [];
+    order.audit.push({ action: 'refund', note, at: new Date() });
+    order.status = 'refunded';
+    await order.save();
+    res.json(order);
   } catch (err) { next(err); }
 });
 

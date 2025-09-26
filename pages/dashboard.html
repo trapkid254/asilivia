@@ -53,6 +53,7 @@
                         <li><a href="#" data-section="overview" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
                         <li><a href="#" data-section="orders"><i class="fas fa-shopping-bag"></i> Orders</a></li>
                         <li><a href="#" data-section="repairs"><i class="fas fa-tools"></i> Repair Requests</a></li>
+                        <li><a href="#" data-section="vouchers"><i class="fas fa-ticket"></i> Vouchers</a></li>
                         <li><a href="#" data-section="addresses"><i class="fas fa-map-marker-alt"></i> Addresses</a></li>
                         <li><a href="#" data-section="profile"><i class="fas fa-user"></i> Profile Details</a></li>
                         <li><a href="#" data-section="password"><i class="fas fa-lock"></i> Change Password</a></li>
@@ -67,6 +68,31 @@
                             <h2>Dashboard Overview</h2>
                             <p>Welcome back, John Doe! Here's what's happening with your orders and repair requests.</p>
                         </div>
+
+                    <!-- Vouchers Section -->
+                    <div id="vouchers" class="dashboard-section">
+                        <div class="dashboard-header">
+                            <h2>My Vouchers</h2>
+                            <p>View and track your available and used vouchers.</p>
+                        </div>
+
+                        <div class="table-container">
+                            <table class="orders-table">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Assigned To</th>
+                                        <th>Used At</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="vouchersTableBody">
+                                    <tr><td colspan="5">Loading...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                         
                         <div class="overview-cards">
                             <div class="overview-card">
