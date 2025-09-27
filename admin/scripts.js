@@ -567,6 +567,13 @@ function loadProductsSection(contentArea) {
                             <label for="productDescription">Description</label>
                             <textarea id="productDescription" rows="4" placeholder="Short description, specs, key features..."></textarea>
                         </div>
+                        <div class="form-group">
+                            <label for="productFeatured">Featured</label>
+                            <select id="productFeatured">
+                                <option value="false" selected>No</option>
+                                <option value="true">Yes</option>
+                            </select>
+                        </div>
                         <div class="form-group" style="grid-column: 1 / -1;">
                             <label>Preview</label>
                             <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;display:flex;align-items:center;justify-content:center;height:160px;background:#fafafa;">
@@ -616,6 +623,7 @@ function initializeProductsManagement() {
                         brand: p.brand||'',
                         stock: Number(p.stock)||0,
                         status: p.status||'active',
+                        featured: !!p.featured,
                         image: p.image || '../assets/images/placeholder-smartphone.jpg'
                     }));
                 }
@@ -668,7 +676,7 @@ function initializeProductsManagement() {
                     <h4>${product.name}</h4>
                     <p class="product-price">KSh ${product.price.toFixed(2)}</p>
                     <p class="product-stock">Stock: ${product.stock}</p>
-                    <p class="product-status status-${product.status}">${(product.status||'active').toString()}</p>
+                    <p class="product-status status-${product.status}">${(product.status||'active').toString()} ${product.featured ? '<span class="badge" style="margin-left:6px;background:#fde68a;color:#92400e;padding:2px 8px;border-radius:999px;font-size:12px;">Featured</span>' : ''}</p>
                 </div>
                 <div class="product-actions">
                     <button class="btn btn-sm btn-secondary edit-product" data-id="${product.id}">
@@ -778,7 +786,8 @@ function initializeProductsManagement() {
             brand: document.getElementById('productBrand').value,
             stock: parseInt(document.getElementById('productStock').value),
             description: document.getElementById('productDescription').value,
-            image: imageValue
+            image: imageValue,
+            featured: String(document.getElementById('productFeatured').value) === 'true'
         };
 
         const token = localStorage.getItem('adminToken') || '';
@@ -827,6 +836,9 @@ function initializeProductsManagement() {
             document.getElementById('productBrand').value = product.brand;
             document.getElementById('productStock').value = product.stock;
             document.getElementById('productDescription').value = product.description || '';
+            // Featured
+            const featuredSel = document.getElementById('productFeatured');
+            if (featuredSel) featuredSel.value = product.featured ? 'true' : 'false';
             // If image is a URL, prefill it; if data URL, leave field blank
             const isDataUrl = (product.image||'').startsWith('data:');
             document.getElementById('productImage').value = isDataUrl ? '' : (product.image || '');
@@ -1195,11 +1207,46 @@ function loadBookingsSection(contentArea) {
             </table>
         </div>`;
 
-    function renderBookingsTable() {
-        if (!window.dataManager) return;
+    // Booking details modal
+    let bookingModal = null;
+    function ensureBookingModal(){
+        if (bookingModal) return bookingModal;
+        bookingModal = document.createElement('div');
+        bookingModal.id = 'bookingModal';
+        bookingModal.className = 'modal';
+        bookingModal.style.display = 'none';
+        bookingModal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Booking Details</h3>
+                    <span class="close" id="bookingModalClose" title="Close">&times;</span>
+                </div>
+                <div class="modal-body" id="bookingModalBody" style="max-height:60vh;overflow:auto;">Loading...</div>
+            </div>`;
+        document.body.appendChild(bookingModal);
+        bookingModal.querySelector('#bookingModalClose')?.addEventListener('click', ()=> bookingModal.style.display='none');
+        return bookingModal;
+    }
+
+    async function renderBookingsTable() {
         const tbody = document.querySelector('#bookingsTable tbody');
         const q = (document.getElementById('bookingSearch')?.value || '').trim().toLowerCase();
-        const bookings = window.dataManager.getBookings()
+        let bookings = [];
+        // Backend first (admin: all bookings)
+        if (window.api) {
+            try {
+                const token = localStorage.getItem('adminToken') || '';
+                const resp = await fetch('/api/bookings', { headers: token? { 'x-admin-token': token } : {} });
+                if (resp.ok) {
+                    const data = await resp.json();
+                    if (Array.isArray(data)) bookings = data;
+                }
+            } catch(_) { /* fallback below */ }
+        }
+        if (!bookings.length && window.dataManager) {
+            bookings = window.dataManager.getBookings();
+        }
+        bookings = bookings
             .filter(b => !q ||
                 String(b.id||'').toLowerCase().includes(q) ||
                 String(b?.customer?.name||'').toLowerCase().includes(q) ||
@@ -1231,9 +1278,13 @@ function loadBookingsSection(contentArea) {
                     <select class="booking-status-select" data-id="${b.id}">
                         ${['pending','diagnostic','in-progress','completed','cancelled','scheduled'].map(s => `<option value="${s}" ${String(b.status||'').toLowerCase()===s?'selected':''}>${s.charAt(0).toUpperCase()+s.slice(1)}</option>`).join('')}
                     </select>
+                    <div style="font-size:12px;color:#6b7280;margin-top:4px;">
+                        Quote: ${b.quoteStatus||'none'}${b.quoteAmount? ` (KSh ${Number(b.quoteAmount).toFixed(2)})` : ''}
+                    </div>
                 </td>
                 <td>
                     <button class="action-btn view" data-id="${b.id}" title="View"><i class="fas fa-eye"></i></button>
+                    <button class="action-btn edit" data-act="quote" data-id="${b.id}" title="Propose Quote"><i class="fas fa-money-bill"></i></button>
                 </td>`;
             tbody.appendChild(tr);
         });
@@ -1261,6 +1312,70 @@ function loadBookingsSection(contentArea) {
         if (evt?.detail?.type === 'bookings') {
             renderBookingsTable();
             renderDashboardStats();
+        }
+    });
+
+    // View booking details
+    contentArea.addEventListener('click', async function(e){
+        const btn = e.target.closest('.action-btn.view');
+        if (!btn) return;
+        const id = btn.getAttribute('data-id');
+        if (!id) return;
+        let booking = null;
+        const token = localStorage.getItem('adminToken') || '';
+        try {
+            const resp = await fetch('/api/bookings/'+encodeURIComponent(id), { headers: token? { 'x-admin-token': token } : {} });
+            if (resp.ok) booking = await resp.json();
+        } catch(_){ }
+        if (!booking && window.dataManager) {
+            try { booking = window.dataManager.getBookings().find(b=> String(b.id)===String(id)); } catch(_){}
+        }
+        if (!booking) return alert('Booking not found');
+        const m = ensureBookingModal();
+        const body = document.getElementById('bookingModalBody');
+        const cust = booking.customer||{};
+        const device = booking.device||{};
+        const issue = booking.issue||{};
+        body.innerHTML = `
+            <p><strong>ID:</strong> ${booking._id || booking.id || ''}</p>
+            <p><strong>Customer:</strong> ${(cust.firstName||'')+' '+(cust.lastName||'')} (${cust.email||''}${cust.phone? ' | '+cust.phone:''})</p>
+            <p><strong>Device:</strong> ${(device.brand||'')+' '+(device.model||'')}</p>
+            <p><strong>Issue:</strong> ${issue.type||''}</p>
+            <p><strong>Status:</strong> ${booking.status||''}</p>
+            <p><strong>Date:</strong> ${booking.createdAt? new Date(booking.createdAt).toLocaleString():''}</p>
+        `;
+        m.style.display = 'block';
+    });
+
+    // Propose a quote
+    contentArea.addEventListener('click', async function(e){
+        const btn = e.target.closest('button[data-act="quote"]');
+        if (!btn) return;
+        const id = btn.getAttribute('data-id');
+        const amountStr = prompt('Enter quote amount (KSh):');
+        if (!amountStr) return;
+        const amount = parseFloat(amountStr);
+        if (!isFinite(amount) || amount <= 0) return alert('Invalid amount');
+        const note = prompt('Optional note for the customer (e.g., parts and labor):') || '';
+        const token = localStorage.getItem('adminToken') || '';
+        let ok = false;
+        try {
+            const resp = await fetch('/api/bookings/'+encodeURIComponent(id)+'/quote', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', ...(token?{'x-admin-token':token}:{}) },
+                body: JSON.stringify({ amount, note })
+            });
+            ok = resp.ok;
+        } catch(_){}
+        if (!ok) {
+            // Fallback: store quote in local cache if your dataManager supports it
+            try { window.dataManager?.setBookingQuote?.(id, { amount, note, status: 'proposed' }); ok = true; } catch(_){ }
+        }
+        if (ok) {
+            renderBookingsTable();
+            renderDashboardStats();
+        } else {
+            alert('Failed to propose quote. Ensure backend is running and admin token is set.');
         }
     });
 

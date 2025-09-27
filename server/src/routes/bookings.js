@@ -20,6 +20,55 @@ router.get('/', async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+// Propose a quote (admin)
+router.post('/:id/quote', adminAuth, async (req, res, next) => {
+  try {
+    const { amount, note } = req.body || {};
+    const b = await Booking.findById(req.params.id);
+    if (!b) return res.status(404).json({ error: 'Booking not found' });
+    if (typeof amount !== 'number' || amount <= 0) return res.status(400).json({ error: 'Valid amount required' });
+    b.quoteAmount = amount;
+    b.quoteNote = note || '';
+    b.quoteStatus = 'proposed';
+    b.quoteAt = new Date();
+    await b.save();
+    res.json(b);
+  } catch (err) { next(err); }
+});
+
+// Accept quote (customer)
+router.post('/:id/quote/accept', async (req, res, next) => {
+  try {
+    const { email, phone } = req.body || {};
+    const b = await Booking.findById(req.params.id);
+    if (!b) return res.status(404).json({ error: 'Booking not found' });
+    // Simple identity check
+    if (b.customer?.email && email && b.customer.email !== email) return res.status(403).json({ error: 'Forbidden' });
+    if (b.customer?.phone && phone && b.customer.phone !== phone) return res.status(403).json({ error: 'Forbidden' });
+    if (b.quoteStatus !== 'proposed') return res.status(400).json({ error: 'No active quote' });
+    b.quoteStatus = 'accepted';
+    b.quoteAcceptedAt = new Date();
+    await b.save();
+    res.json(b);
+  } catch (err) { next(err); }
+});
+
+// Decline quote (customer)
+router.post('/:id/quote/decline', async (req, res, next) => {
+  try {
+    const { email, phone } = req.body || {};
+    const b = await Booking.findById(req.params.id);
+    if (!b) return res.status(404).json({ error: 'Booking not found' });
+    if (b.customer?.email && email && b.customer.email !== email) return res.status(403).json({ error: 'Forbidden' });
+    if (b.customer?.phone && phone && b.customer.phone !== phone) return res.status(403).json({ error: 'Forbidden' });
+    if (b.quoteStatus !== 'proposed') return res.status(400).json({ error: 'No active quote' });
+    b.quoteStatus = 'declined';
+    b.quoteAcceptedAt = undefined;
+    await b.save();
+    res.json(b);
+  } catch (err) { next(err); }
+});
+
 // Get booking
 router.get('/:id', async (req, res, next) => {
   try {

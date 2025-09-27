@@ -38,6 +38,12 @@ const BookingSchema = new mongoose.Schema({
     address: String,
     notes: String,
   },
+  // Quote workflow
+  quoteAmount: { type: Number, default: 0 },
+  quoteNote: { type: String },
+  quoteStatus: { type: String, enum: ['none', 'proposed', 'accepted', 'declined'], default: 'none' },
+  quoteAt: { type: Date },
+  quoteAcceptedAt: { type: Date },
 }, { timestamps: true });
 
 export default mongoose.model('Booking', BookingSchema);

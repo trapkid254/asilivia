@@ -7,11 +7,16 @@ const router = Router();
 // List products (optionally filter by status=active)
 router.get('/', async (req, res, next) => {
   try {
-    const { status, q, brand, category, sort = 'createdAt:desc', page = '1', limit = '50' } = req.query;
+    const { status, q, brand, category, featured, sort = 'createdAt:desc', page = '1', limit = '50' } = req.query;
     const query = {};
     if (status) query.status = status;
     if (brand) query.brand = brand;
     if (category) query.category = category;
+    if (typeof featured !== 'undefined') {
+      const fv = String(featured).toLowerCase();
+      if (fv === 'true' || fv === '1') query.featured = true;
+      else if (fv === 'false' || fv === '0') query.featured = false;
+    }
     if (q) {
       query.$or = [
         { name: new RegExp(q, 'i') },

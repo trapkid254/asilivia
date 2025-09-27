@@ -9,6 +9,7 @@ const ProductSchema = new mongoose.Schema({
   description: { type: String },
   stock: { type: Number, default: 0 },
   status: { type: String, enum: ['active', 'inactive'], default: 'active' },
+  featured: { type: Boolean, default: false },
 }, { timestamps: true });
 
 export default mongoose.model('Product', ProductSchema);
