@@ -28,8 +28,14 @@ document.addEventListener('DOMContentLoaded', function() {
     function renderFeatured(products){
         const grid = document.querySelector('.featured-products .product-grid');
         if (!grid) return;
-        if (!products.length) return; // keep placeholders if none
         grid.innerHTML = '';
+        if (!products.length) {
+            const empty = document.createElement('div');
+            empty.className = 'empty-state';
+            empty.textContent = 'No featured products yet.';
+            grid.appendChild(empty);
+            return;
+        }
         products.forEach(p => {
             const stockNum = Number(p.stock)||0;
             const out = stockNum <= 0;

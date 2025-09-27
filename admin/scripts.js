@@ -513,13 +513,13 @@ function loadProductsSection(contentArea) {
         
         <!-- Add Product Modal -->
         <div id="productModal" class="modal" style="display: none;">
-            <div class="modal-content">
+            <div class="modal-content" style="max-height:85vh;overflow:auto;">
                 <div class="modal-header">
                     <h3 id="modalTitle">Add Product</h3>
                     <span class="close" title="Close">&times;</span>
                 </div>
                 <form id="productForm">
-                    <div class="form-grid two-col">
+                    <div class="form-grid two-col" style="max-height:calc(85vh - 140px);overflow:auto;">
                         <div class="form-group">
                             <label for="productName">Product Name</label>
                             <input type="text" id="productName" placeholder="e.g. iPhone 15 Pro" required>
@@ -581,7 +581,7 @@ function loadProductsSection(contentArea) {
                             </div>
                         </div>
                     </div>
-                    <div class="form-actions">
+                    <div class="form-actions" style="position:sticky;bottom:0;background:#fff;padding-top:8px;">
                         <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
                         <button type="submit" class="btn btn-primary">Save Product</button>
                     </div>
