@@ -21,6 +21,26 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(()=>{ try{ t.remove(); }catch(_){ } }, 5000);
     }
 
+    // Offline banner helpers
+    function ensureOfflineBanner(){
+        let b = document.getElementById('offlineBanner');
+        if (!b){
+            b = document.createElement('div');
+            b.id = 'offlineBanner';
+            b.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:10px;background:#f59e0b;color:#111827;padding:8px 12px;border-radius:999px;box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:9999;font-size:14px;display:none;';
+            b.textContent = 'Offline mode: showing cached data';
+            document.body.appendChild(b);
+        }
+        return b;
+    }
+    async function updateOnlineStatus(){
+        try {
+            const up = await (window.api?.isBackendUp?.(false));
+            const b = ensureOfflineBanner();
+            b.style.display = up ? 'none' : 'block';
+        } catch(_) { /* ignore */ }
+    }
+
     // Track last known order statuses to surface changes via toast
     let lastOrderStatuses = {};
     try {
@@ -106,8 +126,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (parsed && (parsed.email || parsed.phone)) current = parsed;
         } catch (_) { /* ignore */ }
 
+        let backendUp = false;
         if (window.api && current) {
             try {
+                backendUp = await window.api.isBackendUp?.(false);
                 const params = new URLSearchParams();
                 if (current.email) params.set('email', String(current.email).trim());
                 if (current.phone) params.set('phone', String(current.phone).trim());
@@ -124,6 +146,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             } catch (_) { /* fallback below */ }
         }
+        // If backend is up, do not use local fallbacks; also clear stale caches
+        if (backendUp) {
+            try { localStorage.removeItem('orders'); } catch(_){}
+        }
 
     // Render vouchers into Vouchers section
     async function renderVouchers() {
@@ -137,8 +163,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (parsed && (parsed.email || parsed.phone)) current = parsed;
         } catch (_) { /* ignore */ }
         let vouchers = [];
+        let backendUpV = false;
         if (window.api && current) {
             try {
+                backendUpV = await window.api.isBackendUp?.(false);
                 const params = new URLSearchParams();
                 if (current.email) params.set('email', String(current.email).trim());
                 if (current.phone) params.set('phone', String(current.phone).trim());
@@ -146,7 +174,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (Array.isArray(fetched)) vouchers = fetched;
             } catch (_) { /* fallback below */ }
         }
-        if (!vouchers.length) {
+        if (!vouchers.length && !backendUpV) {
             // Fallback to local storage vouchers via dataManager
             try {
                 const all = (window.dataManager?.getVouchers?.() || []);
@@ -156,6 +184,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     vouchers = [];
                 }
             } catch (_) { vouchers = []; }
+        }
+        // Clear local vouchers cache if backend is up
+        if (backendUpV) {
+            try { /* no direct vouchers key; rely on backend */ } catch(_){}
         }
         tbody.innerHTML = '';
         if (!vouchers.length) {
@@ -179,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-        if (!orders.length) {
+        if (!orders.length && !backendUp) {
             // Fallbacks
             if (hasDM) {
                 orders = window.dataManager.getOrders();
@@ -191,6 +223,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 } catch (e) { /* ignore */ }
             }
         }
+        // If backend is up and still no orders, intentionally show none
         // Filter to current customer only (by email or phone)
         if (current) {
             const email = String(current.email || '').trim().toLowerCase();
@@ -598,6 +631,11 @@ document.addEventListener('DOMContentLoaded', function() {
         modal.style.display = 'flex';
     });
     
+    // Periodically refresh and update online status
+    try { setInterval(()=>{ try{ renderOrders(); }catch(_){}; updateOnlineStatus(); }, 60000); } catch(_){}
+    window.addEventListener('focus', function(){ renderOrders(); updateOnlineStatus(); });
+    document.addEventListener('visibilitychange', function(){ if (!document.hidden) { renderOrders(); updateOnlineStatus(); } });
+
     // Profile form submission
     const profileForm = document.getElementById('profileForm');
     if (profileForm) {
