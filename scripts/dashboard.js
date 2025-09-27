@@ -488,11 +488,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const created = b.createdAt ? new Date(b.createdAt).toLocaleDateString() : '';
             const title = `${b.device?.brand || ''} ${b.device?.model || ''} - ${b.issue?.type || 'Repair'}`.trim();
             const statusClass = (b.status || 'pending').toLowerCase().replace(/\s+/g,'-');
+            const bid = b._id || b.id || '';
             const card = document.createElement('div');
             card.className = 'repair-card';
             card.innerHTML = `
                 <div class="repair-header">
-                    <span class="repair-id">${b.id || ''}</span>
+                    <span class="repair-id">${bid}</span>
                     <span class="repair-date">${created}</span>
                 </div>
                 <div class="repair-details">
@@ -501,7 +502,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <p>Urgency: ${b.service?.urgency || 'standard'}</p>
                 </div>
                 <div class="repair-actions">
-                    <button class="btn btn-small view-repair-details" data-repair="${b.id}">View Details</button>
+                    <button class="btn btn-small view-repair-details" data-repair="${bid}">View Details</button>
                 </div>`;
             container.appendChild(card);
         });
@@ -669,7 +670,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!booking && window.dataManager) {
             try {
                 const all = window.dataManager.getBookings();
-                booking = all.find(b => String(b.id) === String(bookingId));
+                booking = all.find(b => String(b.id) === String(bookingId) || String(b._id||'') === String(bookingId));
             } catch(_){ }
         }
         if (!booking) return showToast('Booking not found', 'error');
