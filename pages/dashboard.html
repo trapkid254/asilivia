@@ -57,7 +57,7 @@
                         <li><a href="#" data-section="addresses"><i class="fas fa-map-marker-alt"></i> Addresses</a></li>
                         <li><a href="#" data-section="profile"><i class="fas fa-user"></i> Profile Details</a></li>
                         <li><a href="#" data-section="password"><i class="fas fa-lock"></i> Change Password</a></li>
-                        <li><a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                        <li><a href="#" id="customerLogoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                     </ul>
                 </div>
                 
@@ -66,7 +66,7 @@
                     <div id="overview" class="dashboard-section active">
                         <div class="dashboard-header">
                             <h2>Dashboard Overview</h2>
-                            <p>Welcome back, John Doe! Here's what's happening with your orders and repair requests.</p>
+                            <p id="dashboardGreeting">Welcome</p>
                         </div>
 
                     <!-- Vouchers Section -->
@@ -186,38 +186,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>#ORD-1234</td>
-                                        <td>Oct 15, 2023</td>
-                                        <td>Premium Smartphone XYZ</td>
-                                        <td>$899.99</td>
-                                        <td><span class="order-status status-delivered">Delivered</span></td>
-                                        <td>
-                                            <button class="btn btn-small view-order-details" data-order="ORD-1234">View</button>
-                                        </td>
-                                    </tr>
-                                    
-                                    <tr>
-                                        <td>#ORD-1235</td>
-                                        <td>Oct 10, 2023</td>
-                                        <td>Wireless Headphones, Smartwatch</td>
-                                        <td>$449.98</td>
-                                        <td><span class="order-status status-shipped">Shipped</span></td>
-                                        <td>
-                                            <button class="btn btn-small view-order-details" data-order="ORD-1235">View</button>
-                                        </td>
-                                    </tr>
-                                    
-                                    <tr>
-                                        <td>#ORD-1236</td>
-                                        <td>Oct 5, 2023</td>
-                                        <td>Laptop Pro 2023</td>
-                                        <td>$1299.99</td>
-                                        <td><span class="order-status status-processing">Processing</span></td>
-                                        <td>
-                                            <button class="btn btn-small view-order-details" data-order="ORD-1236">View</button>
-                                        </td>
-                                    </tr>
+                                    <tr><td colspan="6">Loading...</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -230,38 +199,8 @@
                             <p>Track the status of your device repairs</p>
                         </div>
                         
-                        <div class="repair-requests">
-                            <div class="repair-card">
-                                <div class="repair-header">
-                                    <span class="repair-id">#REP-1001</span>
-                                    <span class="repair-date">October 12, 2023</span>
-                                </div>
-                                <div class="repair-details">
-                                    <h4>iPhone 12 Screen Replacement</h4>
-                                    <p>Status: <span class="status-completed">Completed</span></p>
-                                    <p>Estimated Cost: $120.00</p>
-                                </div>
-                                <div class="repair-actions">
-                                    <button class="btn btn-small view-repair-details" data-repair="REP-1001">View Details</button>
-                                    <button class="btn btn-small btn-secondary">Download Invoice</button>
-                                </div>
-                            </div>
-                            
-                            <div class="repair-card">
-                                <div class="repair-header">
-                                    <span class="repair-id">#REP-1002</span>
-                                    <span class="repair-date">October 18, 2023</span>
-                                </div>
-                                <div class="repair-details">
-                                    <h4>MacBook Pro Keyboard Issues</h4>
-                                    <p>Status: <span class="status-in-progress">In Progress</span></p>
-                                    <p>Estimated Cost: $200.00 - $250.00</p>
-                                </div>
-                                <div class="repair-actions">
-                                    <button class="btn btn-small view-repair-details" data-repair="REP-1002">View Details</button>
-                                    <button class="btn btn-small btn-secondary">Contact Support</button>
-                                </div>
-                            </div>
+                        <div class="repair-requests" id="repairsList">
+                            <div class="empty-state">No repair requests yet.</div>
                         </div>
                     </div>
                     
@@ -273,33 +212,7 @@
                         </div>
                         
                         <div class="address-cards">
-                            <div class="address-card">
-                                <h4>Primary Address</h4>
-                                <p>John Doe</p>
-                                <p>123 Main Street</p>
-                                <p>Nairobi, Kenya 00100</p>
-                                <p>+254 700 123 456</p>
-                                
-                                <div class="address-actions">
-                                    <button class="btn btn-small">Edit</button>
-                                    <button class="btn btn-small btn-secondary">Set as Default</button>
-                                </div>
-                            </div>
-                            
-                            <div class="address-card">
-                                <h4>Work Address</h4>
-                                <p>John Doe</p>
-                                <p>456 Business Avenue</p>
-                                <p>Westlands, Nairobi, Kenya 00100</p>
-                                <p>+254 711 987 654</p>
-                                
-                                <div class="address-actions">
-                                    <button class="btn btn-small">Edit</button>
-                                    <button class="btn btn-small btn-secondary">Set as Default</button>
-                                </div>
-                            </div>
-                            
-                            <button class="btn btn-accent">Add New Address</button>
+                            <div class="empty-state">No saved addresses. Guest checkouts won’t save addresses unless you create an account.</div>
                         </div>
                     </div>
                     
@@ -314,27 +227,27 @@
                             <div class="form-row">
                                 <div class="form-group">
                                     <label for="profileFirstName">First Name</label>
-                                    <input type="text" id="profileFirstName" name="firstName" value="John" required>
+                                    <input type="text" id="profileFirstName" name="firstName" value="" placeholder="First name" required>
                                 </div>
                                 <div class="form-group">
                                     <label for="profileLastName">Last Name</label>
-                                    <input type="text" id="profileLastName" name="lastName" value="Doe" required>
+                                    <input type="text" id="profileLastName" name="lastName" value="" placeholder="Last name" required>
                                 </div>
                             </div>
                             
                             <div class="form-group">
                                 <label for="profileEmail">Email Address</label>
-                                <input type="email" id="profileEmail" name="email" value="john.doe@example.com" required>
+                                <input type="email" id="profileEmail" name="email" value="" placeholder="email@example.com" required>
                             </div>
                             
                             <div class="form-group">
                                 <label for="profilePhone">Phone Number</label>
-                                <input type="tel" id="profilePhone" name="phone" value="+254700123456" required>
+                                <input type="tel" id="profilePhone" name="phone" value="" placeholder="+254..." required>
                             </div>
                             
                             <div class="form-group">
                                 <label for="profileBirthdate">Date of Birth</label>
-                                <input type="date" id="profileBirthdate" name="birthdate" value="1990-01-15">
+                                <input type="date" id="profileBirthdate" name="birthdate" value="">
                             </div>
                             
                             <button type="submit" class="btn btn-accent">Save Changes</button>

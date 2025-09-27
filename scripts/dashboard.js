@@ -10,6 +10,73 @@ document.addEventListener('DOMContentLoaded', function() {
             c.className = 'toast-container';
             document.body.appendChild(c);
         }
+
+    // Render customer bookings (repairs) into Repairs section and optionally populate profile
+    async function renderRepairs(profileOnly=false){
+        const list = document.getElementById('repairsList');
+        // If section not present, skip rendering but allow profile population via this function
+        const hasList = !!list;
+        let items = [];
+        // Identify customer
+        let ident = null;
+        try {
+            const raw = localStorage.getItem('currentCustomer');
+            const parsed = raw ? JSON.parse(raw) : null;
+            if (parsed && (parsed.email || parsed.phone)) ident = parsed;
+        } catch(_){ }
+        let backendUp = false;
+        if (window.api && ident) {
+            try {
+                backendUp = await window.api.isBackendUp?.(false);
+                const params = new URLSearchParams();
+                if (ident.email) params.set('email', String(ident.email).trim());
+                if (ident.phone) params.set('phone', String(ident.phone).trim());
+                const fetched = await window.api.getJSON('/api/bookings?' + params.toString());
+                if (Array.isArray(fetched)) items = fetched;
+            } catch(_){ }
+        }
+        // If we have bookings and caller wants to populate profile (no orders case), use the latest
+        if (items.length) {
+            try {
+                const latest = items.slice().sort((a,b)=> new Date(b.createdAt||0) - new Date(a.createdAt||0))[0];
+                setProfileFieldsFromCustomer(latest.customer||{});
+            } catch(_){ }
+        } else if (backendUp && !items.length && profileOnly) {
+            // Backend says none; clear profile
+            clearProfileFields();
+        }
+        if (profileOnly || !hasList) return;
+        // Render list items
+        list.innerHTML = '';
+        if (!items.length) {
+            const empty = document.createElement('div');
+            empty.className = 'empty-state';
+            empty.textContent = 'No repair requests yet.';
+            list.appendChild(empty);
+            return;
+        }
+        items.forEach(b => {
+            const card = document.createElement('div');
+            card.className = 'repair-card';
+            const d = b.createdAt ? new Date(b.createdAt).toLocaleDateString() : '';
+            const issue = b?.issue?.type || '';
+            const dev = [b?.device?.brand, b?.device?.model].filter(Boolean).join(' ');
+            const status = String(b?.status||'').toLowerCase();
+            card.innerHTML = `
+                <div class="repair-header">
+                    <span class="repair-id">${b._id || b.id || ''}</span>
+                    <span class="repair-date">${d}</span>
+                </div>
+                <div class="repair-details">
+                    <h4>${dev} ${issue? ('- '+issue):''}</h4>
+                    <p>Status: <span class="status-${status}">${b.status||''}</span></p>
+                </div>
+                <div class="repair-actions">
+                    <button class="btn btn-small view-repair-details" data-repair="${b._id || b.id || ''}">View Details</button>
+                </div>`;
+            list.appendChild(card);
+        });
+    }
         return c;
     }
     function showToast(message, type='info'){
@@ -104,14 +171,77 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Hide all sections
             dashboardSections.forEach(section => section.classList.remove('active'));
-            
             // Show the target section
             const targetId = this.getAttribute('data-section');
             document.getElementById(targetId).classList.add('active');
         });
     });
-    
-    // Load orders from localStorage into Orders table
+
+    // Helper: set profile fields from a customer object
+    function setProfileFieldsFromCustomer(cust){
+        try {
+            const first = (cust?.firstName || '') || (cust?.name || '').split(' ')[0] || '';
+            const last = (cust?.lastName || '') || (cust?.name || '').split(' ').slice(1).join(' ') || '';
+            const email = cust?.email || '';
+            const phone = cust?.phone || '';
+            const firstEl = document.getElementById('profileFirstName');
+            const lastEl = document.getElementById('profileLastName');
+            const emailEl = document.getElementById('profileEmail');
+            const phoneEl = document.getElementById('profilePhone');
+            if (firstEl) firstEl.value = first;
+            if (lastEl) lastEl.value = last;
+            if (emailEl) emailEl.value = email;
+            if (phoneEl) phoneEl.value = phone;
+            const greet = document.getElementById('dashboardGreeting');
+            if (greet) {
+                const name = [first,last].filter(Boolean).join(' ');
+                greet.textContent = name ? ('Welcome, '+name) : 'Welcome';
+            }
+        } catch(_){}
+    }
+    function clearProfileFields(){
+        try {
+            const firstEl = document.getElementById('profileFirstName');
+            const lastEl = document.getElementById('profileLastName');
+            const emailEl = document.getElementById('profileEmail');
+            const phoneEl = document.getElementById('profilePhone');
+            if (firstEl) firstEl.value = '';
+            if (lastEl) lastEl.value = '';
+            if (emailEl) emailEl.value = '';
+            if (phoneEl) phoneEl.value = '';
+            const greet = document.getElementById('dashboardGreeting');
+            if (greet) greet.textContent = 'Welcome';
+        } catch(_){}
+    }
+
+    // Auth helpers: detect identity and logout
+    function getCurrentIdent(){
+        try {
+            const raw = localStorage.getItem('currentCustomer');
+            const parsed = raw ? JSON.parse(raw) : null;
+            if (parsed && (parsed.email || parsed.phone)) return { email: parsed.email||'', phone: parsed.phone||'' };
+        } catch(_){ }
+        return { email: '', phone: '' };
+    }
+    function doLogout(){
+        try {
+            localStorage.removeItem('currentCustomer');
+            localStorage.removeItem('orders');
+            localStorage.removeItem('lastOrderStatuses');
+        } catch(_){}
+        // Redirect to login so the Login button is visible immediately
+        window.location.href = 'login.html';
+    }
+    // Hook up logout button if present on dashboard page
+    const customerLogoutBtn = document.getElementById('customerLogoutBtn');
+    if (customerLogoutBtn){
+        customerLogoutBtn.addEventListener('click', function(e){
+            e.preventDefault();
+            doLogout();
+        });
+    }
+
+    // Load orders from backend into Orders table (fallbacks only if offline)
     let lastRenderedOrders = [];
     async function renderOrders() {
         const table = document.querySelector('#orders table.orders-table tbody');
@@ -143,6 +273,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         status: o.status || 'pending',
                         customer: o.customer || {}
                     }));
+                    // If we have orders from backend, populate profile with latest order's customer data (guest or registered)
+                    if (orders.length) {
+                        const latest = orders.slice().sort((a,b)=> new Date(b.date)-new Date(a.date))[0];
+                        setProfileFieldsFromCustomer(latest.customer||{});
+                    }
                 }
             } catch (_) { /* fallback below */ }
         }
@@ -222,8 +357,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (Array.isArray(parsed)) orders = parsed;
                 } catch (e) { /* ignore */ }
             }
+            // If falling back, try set profile from the freshest cached order (guest case)
+            if (orders.length) {
+                const latest = orders.slice().sort((a,b)=> new Date(b.date)-new Date(a.date))[0];
+                setProfileFieldsFromCustomer(latest.customer||{});
+            }
         }
-        // If backend is up and still no orders, intentionally show none
+        // If backend is up and still no orders, we will try bookings for profile population
         // Filter to current customer only (by email or phone)
         if (current) {
             const email = String(current.email || '').trim().toLowerCase();
@@ -261,6 +401,8 @@ document.addEventListener('DOMContentLoaded', function() {
             td.textContent = 'No orders yet.';
             tr.appendChild(td);
             table.appendChild(tr);
+            // Try to populate profile from latest booking if any
+            try { await renderRepairs(true /*profileOnly*/); } catch(_){ }
             return;
         }
         // Keep a copy for lookup on View
@@ -632,9 +774,31 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Periodically refresh and update online status
-    try { setInterval(()=>{ try{ renderOrders(); }catch(_){}; updateOnlineStatus(); }, 60000); } catch(_){}
-    window.addEventListener('focus', function(){ renderOrders(); updateOnlineStatus(); });
-    document.addEventListener('visibilitychange', function(){ if (!document.hidden) { renderOrders(); updateOnlineStatus(); } });
+    async function verifyIdentityOrLogout(){
+        try {
+            const ident = getCurrentIdent();
+            if (!ident.email && !ident.phone) return; // no identity
+            const params = new URLSearchParams();
+            if (ident.email) params.set('email', ident.email);
+            if (ident.phone) params.set('phone', ident.phone);
+            if (await window.api?.isBackendUp?.(false)) {
+                // If backend says 404, user has been deleted
+                let ok = true;
+                try {
+                    await window.api.getJSON('/api/customers/find?' + params.toString());
+                } catch(err) {
+                    ok = false;
+                }
+                if (!ok) {
+                    showToast('Your account was removed. Please log in again.', 'info');
+                    doLogout();
+                }
+            }
+        } catch(_){ }
+    }
+    try { setInterval(()=>{ try{ renderOrders(); }catch(_){}; updateOnlineStatus(); verifyIdentityOrLogout(); }, 60000); } catch(_){}
+    window.addEventListener('focus', function(){ renderOrders(); updateOnlineStatus(); verifyIdentityOrLogout(); });
+    document.addEventListener('visibilitychange', function(){ if (!document.hidden) { renderOrders(); updateOnlineStatus(); verifyIdentityOrLogout(); } });
 
     // Profile form submission
     const profileForm = document.getElementById('profileForm');

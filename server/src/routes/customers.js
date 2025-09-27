@@ -12,6 +12,20 @@ router.get('/', async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+// Find customer by email or phone
+router.get('/find', async (req, res, next) => {
+  try {
+    const { email, phone } = req.query || {};
+    if (!email && !phone) return res.status(400).json({ error: 'email or phone required' });
+    const q = [];
+    if (email) q.push({ email: String(email).trim() });
+    if (phone) q.push({ phone: String(phone).trim() });
+    const item = await Customer.findOne({ $or: q });
+    if (!item) return res.status(404).json({ error: 'Customer not found' });
+    res.json(item);
+  } catch (err) { next(err); }
+});
+
 // Get customer
 router.get('/:id', async (req, res, next) => {
   try {

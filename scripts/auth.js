@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Login form submission
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
-        loginForm.addEventListener('submit', function(e) {
+        loginForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
@@ -33,11 +33,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('Please fill in all fields');
                 return;
             }
-            // Persist current customer identity for dashboard filtering
+            // Verify customer exists in database before proceeding
             try {
-                localStorage.setItem('currentCustomer', JSON.stringify({ email: email.trim() }));
-            } catch(_) {}
-            // Redirect directly to dashboard orders (no popup)
+                if (window.api && typeof window.api.getJSON === 'function') {
+                    const params = new URLSearchParams();
+                    params.set('email', String(email).trim());
+                    await window.api.getJSON('/api/customers/find?' + params.toString());
+                } else {
+                    const resp = await fetch('/api/customers/find?email=' + encodeURIComponent(String(email).trim()));
+                    if (!resp.ok) throw new Error('HTTP '+resp.status);
+                }
+            } catch (err) {
+                alert('Account not found. Please register first.');
+                return;
+            }
+            // Persist and redirect on success
+            try { localStorage.setItem('currentCustomer', JSON.stringify({ email: email.trim() })); } catch(_) {}
             window.location.href = 'dashboard.html#orders';
         });
     }

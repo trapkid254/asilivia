@@ -63,7 +63,12 @@
                             
                             <div class="form-group">
                                 <label for="loginPassword">Password</label>
-                                <input type="password" id="loginPassword" name="password" required>
+                                <div class="password-input" style="position:relative;display:flex;align-items:center;">
+                                    <input type="password" id="loginPassword" name="password" required style="padding-right:38px;">
+                                    <button type="button" class="toggle-password" data-target="loginPassword" aria-label="Show password" style="position:absolute;right:8px;background:transparent;border:0;cursor:pointer;color:#6b7280;">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
                                 <a href="#" class="forgot-password">Forgot password?</a>
                             </div>
                             
@@ -111,12 +116,22 @@
                             
                             <div class="form-group">
                                 <label for="registerPassword">Password</label>
-                                <input type="password" id="registerPassword" name="password" required>
+                                <div class="password-input" style="position:relative;display:flex;align-items:center;">
+                                    <input type="password" id="registerPassword" name="password" required style="padding-right:38px;">
+                                    <button type="button" class="toggle-password" data-target="registerPassword" aria-label="Show password" style="position:absolute;right:8px;background:transparent;border:0;cursor:pointer;color:#6b7280;">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
                             </div>
                             
                             <div class="form-group">
                                 <label for="registerConfirmPassword">Confirm Password</label>
-                                <input type="password" id="registerConfirmPassword" name="confirmPassword" required>
+                                <div class="password-input" style="position:relative;display:flex;align-items:center;">
+                                    <input type="password" id="registerConfirmPassword" name="confirmPassword" required style="padding-right:38px;">
+                                    <button type="button" class="toggle-password" data-target="registerConfirmPassword" aria-label="Show password" style="position:absolute;right:8px;background:transparent;border:0;cursor:pointer;color:#6b7280;">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
                             </div>
                             
                             <div class="form-group">
