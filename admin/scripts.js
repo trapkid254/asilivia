@@ -1314,6 +1314,16 @@ function loadBookingsSection(contentArea) {
             renderDashboardStats();
         }
     });
+    // Auto-refresh bookings when window gains focus
+    window.addEventListener('focus', function(){
+        renderBookingsTable();
+    });
+    // Lightweight periodic refresh every 60s
+    try {
+        setInterval(function(){
+            renderBookingsTable();
+        }, 60000);
+    } catch(_) { /* ignore */ }
 
     // View booking details
     contentArea.addEventListener('click', async function(e){

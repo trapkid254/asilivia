@@ -9,7 +9,52 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
     
-    initProductSlider();
+    // Fetch featured products from backend and render into Featured section
+    async function fetchFeaturedProducts(){
+        try {
+            if (window.api && typeof window.api.getJSON === 'function') {
+                const items = await window.api.getJSON('/api/products?status=active&featured=true&limit=8');
+                if (Array.isArray(items)) return items;
+            } else {
+                const resp = await fetch('/api/products?status=active&featured=true&limit=8');
+                if (resp.ok) {
+                    const data = await resp.json();
+                    if (Array.isArray(data)) return data;
+                }
+            }
+        } catch(_) {}
+        return [];
+    }
+    function renderFeatured(products){
+        const grid = document.querySelector('.featured-products .product-grid');
+        if (!grid) return;
+        if (!products.length) return; // keep placeholders if none
+        grid.innerHTML = '';
+        products.forEach(p => {
+            const stockNum = Number(p.stock)||0;
+            const out = stockNum <= 0;
+            const id = p._id || p.id || '';
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+                <div class="product-img">
+                    <img src="${p.image||'assets/images/placeholder-smartphone.jpg'}" alt="${p.name||''}" onerror="this.src='https://via.placeholder.com/250x200?text=Product'">
+                </div>
+                <div class="product-content">
+                    <h3 class="product-title">${p.name||''}</h3>
+                    <div class="product-price">KSh ${(Number(p.price)||0).toFixed(2)}</div>
+                    <div class="product-actions">
+                        <a href="pages/product-detail.html?id=${encodeURIComponent(id)}" class="btn">Details</a>
+                        <a href="#" class="btn btn-accent btn-add-to-cart ${out?'disabled':''}" data-id="${id}" ${out?'aria-disabled="true" tabindex="-1"':''}>${out?'Out of Stock':'Add to Cart'}</a>
+                    </div>
+                </div>`;
+            grid.appendChild(card);
+        });
+        if (typeof initializeCart === 'function') {
+            initializeCart();
+        }
+    }
+    fetchFeaturedProducts().then(renderFeatured);
     
     // Testimonial rotation
     const testimonials = document.querySelectorAll('.testimonial-card');
