@@ -156,19 +156,7 @@
                 <div class="tabs-content">
                     <div id="description" class="tab-content active">
                         <h3>Product Description</h3>
-                        <p>The Premium Smartphone XYZ is designed to provide an exceptional user experience with its cutting-edge technology and sleek design. Whether you're capturing stunning photos, playing graphics-intensive games, or staying productive on the go, this smartphone delivers outstanding performance.</p>
-                        
-                        <h4>Key Features:</h4>
-                        <ul>
-                            <li>6.7-inch Super Retina XDR display with ProMotion technology</li>
-                            <li>A15 Bionic chip with 6-core CPU and 5-core GPU</li>
-                            <li>Advanced dual-camera system with 12MP Wide and Ultra Wide cameras</li>
-                            <li>12MP TrueDepth front camera with Night mode</li>
-                            <li>5G connectivity for faster downloads and streaming</li>
-                            <li>All-day battery life with up to 28 hours of video playback</li>
-                            <li>Ceramic Shield front cover for superior durability</li>
-                            <li>iOS operating system with regular security updates</li>
-                        </ul>
+                        <p id="productDescriptionTab">Loading...</p>
                     </div>
                     
                     <div id="specifications" class="tab-content">
@@ -422,6 +410,7 @@
             const imgEl = document.getElementById('mainProductImage');
             const priceEl = document.getElementById('productPrice');
             const descEl = document.getElementById('productDescription');
+            const descTabEl = document.getElementById('productDescriptionTab');
             const breadcrumbEl = document.getElementById('breadcrumbProductName');
             const metaEl = document.getElementById('productMeta');
             const addBtn = document.getElementById('addToCartBtn');
@@ -431,6 +420,7 @@
             if(imgEl) imgEl.src = p.image || '../assets/images/placeholder-smartphone.jpg';
             if(priceEl) priceEl.textContent = formatPrice(p.price);
             if(descEl) descEl.textContent = p.description || '';
+            if(descTabEl) descTabEl.textContent = p.description || '';
 
             // Stock badge
             const stock = Number(p.stock)||0;

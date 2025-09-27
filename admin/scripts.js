@@ -205,10 +205,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (window.api) {
             try {
                 const token = localStorage.getItem('adminToken') || '';
-                const resp = await fetch('/api/orders', { headers: token ? { 'x-admin-token': token } : {} });
-                if (resp.ok) {
-                    const data = await resp.json();
-                    if (Array.isArray(data)) orders = data.map(o => ({
+                const data = await window.api.getJSON('/api/orders', { headers: token ? { 'x-admin-token': token } : {} });
+                if (Array.isArray(data)) {
+                    orders = data.map(o => ({
                         id: o._id || o.id,
                         customer: { name: (o.customer?.firstName || '') + ' ' + (o.customer?.lastName || ''), email: o.customer?.email, phone: o.customer?.phone },
                         date: o.createdAt || o.date,
@@ -1029,11 +1028,33 @@ function loadOrdersSection(contentArea) {
             </div>
         </div>`;
 
-    function renderOrdersTable() {
-        if (!window.dataManager) return;
+    async function renderOrdersTable() {
         const tbody = document.querySelector('#ordersTable tbody');
+        if (!tbody) return;
         const q = (document.getElementById('orderSearch')?.value || '').trim().toLowerCase();
-        const orders = window.dataManager.getOrders()
+        let orders = [];
+        // Backend first
+        if (window.api) {
+            try {
+                const token = localStorage.getItem('adminToken') || '';
+                const data = await window.api.getJSON('/api/orders', { headers: token ? { 'x-admin-token': token } : {} });
+                if (Array.isArray(data)) {
+                    orders = data.map(o => ({
+                        id: o._id || o.id,
+                        customer: { name: ((o.customer?.firstName||'') + ' ' + (o.customer?.lastName||'')).trim(), email: o.customer?.email, phone: o.customer?.phone },
+                        date: o.createdAt || o.date,
+                        total: o.total,
+                        status: o.status || 'pending',
+                        items: o.items || []
+                    }));
+                }
+            } catch(_) { /* fallback below */ }
+        }
+        if (!orders.length && window.dataManager) {
+            orders = window.dataManager.getOrders();
+        }
+        // Apply filter
+        orders = orders
             .filter(o => !q ||
                 String(o.id||'').toLowerCase().includes(q) ||
                 String(o?.customer?.name||'').toLowerCase().includes(q) ||
@@ -1103,6 +1124,9 @@ function loadOrdersSection(contentArea) {
     document.getElementById('orderSearch')?.addEventListener('input', function(){
         renderOrdersTable();
     });
+    // Refresh on focus and every 60s to catch new guest orders saved in MongoDB
+    window.addEventListener('focus', function(){ try{ renderOrdersTable(); }catch(_){}});
+    try { setInterval(()=>{ try{ renderOrdersTable(); }catch(_){ } }, 60000); } catch(_){ }
     // View order details with audit
     contentArea.addEventListener('click', async function(e){
         const btn = e.target.closest('.action-btn.view');
@@ -1116,8 +1140,7 @@ function loadOrdersSection(contentArea) {
         const token = localStorage.getItem('adminToken') || '';
         let order = null;
         try {
-            const resp = await fetch('/api/orders/'+encodeURIComponent(id), { headers: token? { 'x-admin-token': token } : {} });
-            if (resp.ok) order = await resp.json();
+            order = await window.api.getJSON('/api/orders/'+encodeURIComponent(id), { headers: token? { 'x-admin-token': token } : {} });
         } catch(_){}
         if (!order && window.dataManager) {
             try {
@@ -1158,13 +1181,9 @@ function loadOrdersSection(contentArea) {
         const note = prompt(`Enter a note for ${act} (optional):`) || '';
         const token = localStorage.getItem('adminToken') || '';
         try {
-            const resp = await fetch(`/api/orders/${encodeURIComponent(id)}/${act}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', ...(token?{'x-admin-token':token}:{}) },
-                body: JSON.stringify({ note })
+            await window.api.postJSON(`/api/orders/${encodeURIComponent(id)}/${act}`, { note }, {
+                headers: { ...(token?{'x-admin-token':token}:{}) }
             });
-            if (!resp.ok) throw new Error('HTTP '+resp.status);
-            await resp.json();
             renderOrdersTable();
             renderDashboardStats();
         } catch (_) {
